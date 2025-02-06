@@ -1,5 +1,3 @@
 streamlit_lottie
 streamlit_option_menu
-streamlit-carousel
-base64
 plotly
