@@ -19,65 +19,56 @@ resumes = [
     {
         "title": "Data Science Resume",
         "description": "Focused on ML and AI projects",
-        "file": "resumes/resume_25v1.pdf",
-        "image": "images/resume_25v1.jpg"  # Corresponding JPG file
+        "file": "resumes/resume_25v1.pdf"
     },
     {
         "title": "Full Stack Developer",
         "description": "Web development expertise",
-        "file": "resumes/resume_25v2.pdf",
-        "image": "images/resume_25v2.jpg"  # Corresponding JPG file
+        "file": "resumes/resume_25v2.pdf"
     },
     {
         "title": "Business Analyst",
         "description": "Analytics and insights",
-        "file": "resumes/resume_25v3a.pdf",
-        "image": "images/resume_25v3a.jpg"  # Corresponding JPG file
+        "file": "resumes/resume_25v3a.pdf"
     },
     {
         "title": "Python Developer",
         "description": "Python programming specialist",
-        "file": "resumes/resume_25v3i.pdf",
-        "image": "images/resume_25v3i.jpg"  # Corresponding JPG file
+        "file": "resumes/resume_25v3i.pdf"
     },
     {
         "title": "Machine Learning",
         "description": "ML/AI focused projects",
-        "file": "resumes/resume_25v4b.pdf",
-        "image": "images/resume_25v4b.jpg"  # Corresponding JPG file
+        "file": "resumes/resume_25v4b.pdf"
     },
     {
         "title": "Research Resume",
         "description": "Academic research focus",
-        "file": "resumes/resume_25v5b.pdf",
-        "image": "images/resume_25v5b.jpg"  # Corresponding JPG file
+        "file": "resumes/resume_25v5b.pdf"
     },
     {
         "title": "Another Full Stack Developer Resume",
         "description": "Additional web development expertise",
-        "file": "resumes/resume_25v6a.pdf",
-        "image": "images/resume_25v6a.jpg"  # Corresponding JPG file
+        "file": "resumes/resume_25v6a.pdf"
     },
     {
         "title": "Another Business Analyst Resume",
         "description": "Further analytics and insights",
-        "file": "resumes/resume_25v6i.pdf",
-        "image": "images/resume_25v6i.jpg"  # Corresponding JPG file
+        "file": "resumes/resume_25v6i.pdf"
     }
 ]
 
 certifications = [
     {
         "title": "Data Science - By Excelr",
-        "image": "certifications/Excelr(Data Science)_Certification.jpg",
         "pdf": "certifications/Excelr(Data Science)_Certification.pdf"
     },
     {
         "title": "Business Analytics - Internshala",
-        "image": "certifications/Internshala(Business Analytics)_Certification.jpg",
         "pdf": "certifications/Internshala(Business Analytics)_Certification.pdf"
     }
 ]
+
 # Load CSS
 def load_css():
     st.markdown("""
@@ -95,85 +86,21 @@ def load_css():
     </style>
     """, unsafe_allow_html=True)
 
-# Load Lottie animation
-def load_lottieurl(url):
-    r = requests.get(url)
-    if r.status_code != 200:
-        return None
-    return r.json()
-
-# Set background image based on role
-def set_background(image_path):
-    st.markdown(
-         f"""
-         <style>
-         .stApp {{
-             background-image: url("data:image/png;base64,{image_path}");
-             background-size: cover;
-         }}
-         </style>
-         """,
-         unsafe_allow_html=True
-     )
-def projects_section():
-    # Projects section
-    project_section()
-
-# Certifications section
-def certifications_section():
-    render_certifications_section(certifications)
-
-# Contact section
-def contact_section():
-    display_contact_section(resumes)
-# Set background image based on role
-def set_background(image_path):
-    st.markdown(
-         f"""
-         <style>
-         .stApp {{
-             background-image: url("data:image/png;base64,{image_path}");
-             background-size: cover;
-         }}
-         </style>
-         """,
-         unsafe_allow_html=True
-     )
 # Main function
 def main():
     load_css()
-
-    # Role selection navbar
-    role = option_menu(
-        menu_title=None,
-        options=["Data Analyst", "Data Scientist", "Python Developer"],
-        icons=["bar-chart-fill", "gear-fill", "code-slash"],
-        menu_icon="cast",
-        default_index=0,
-        orientation="horizontal",
-        styles={
-            "container": {"padding": "0!important", "background-color": "rgba(250, 250, 250, 0.8)"},
-            "icon": {"color": "orange", "font-size": "calc(16px + 0.5vw)"}, 
-            "nav-link": {"font-size": "calc(14px + 0.5vw)", "text-align": "left", "margin":"0px", "--hover-color": "#eee"},
-            "nav-link-selected": {"background-color": "#02ab21"},
-        }
-    )
-
-    # Set background based on role
-    background_images = {
-        "Data Analyst": "data_analyst_bg.jpg",
-        "Data Scientist": "data_scientist_bg.jpg",
-        "Python Developer": "python_developer_bg.jpg"
-    }
-    set_background(background_images[role])
-
+    
+    # Check if the session state is initialized
+    if 'selected' not in st.session_state:
+        st.session_state.selected = "Profile"
+    
     # Page selection navbar
-    selected = option_menu(
+    st.session_state.selected = option_menu(
         menu_title=None,
         options=["Profile", "Education", "Skills", "Projects", "Certifications", "Contact"],
         icons=["house", "graduation-cap", "gear", "code-slash", "certificate", "envelope"],
         menu_icon="cast",
-        default_index=0,
+        default_index=0 if st.session_state.selected == "Profile" else 1,
         orientation="horizontal",
         styles={
             "container": {"padding": "0!important", "background-color": "rgba(250, 250, 250, 0.8)"},
@@ -184,18 +111,18 @@ def main():
     )
 
     # Display the selected page
-    if selected == "Profile":
+    if st.session_state.selected == "Profile":
         profile_section()
-    elif selected == "Education":
+    elif st.session_state.selected == "Education":
         education_section()
-    elif selected == "Skills":
+    elif st.session_state.selected == "Skills":
         skills_section()
-    elif selected == "Projects":
-        projects_section()
-    elif selected == "Certifications":
-        certifications_section()
-    elif selected == "Contact":
-        contact_section()
+    elif st.session_state.selected == "Projects":
+        project_section()
+    elif st.session_state.selected == "Certifications":
+        render_certifications_section(certifications)
+    elif st.session_state.selected == "Contact":
+        display_contact_section(resumes)
 
 if __name__ == "__main__":
     main()
