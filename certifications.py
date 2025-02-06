@@ -14,14 +14,15 @@ def load_styles() -> None:
         margin: 0 auto;
     }
     .cert-container {
-        display: flex;
+        display: flex; 
+        flex-wrap: wrap; 
         justify-content: center;
         align-items: start;
         gap: 40px;
         margin-top: 20px;
     }
     .cert-card {
-        width: 320px;
+        width: 320px; 
         height: 360px;
         perspective: 1500px;
         flex-shrink: 0;
@@ -78,6 +79,18 @@ def load_styles() -> None:
         padding-bottom: 0;
         max-width: 100%;
     }
+    /* Optional: Responsive adjustment to ensure cards don't get too small */
+    @media only screen and (max-width: 768px) {
+        .cert-card {
+            width: calc(50% - 20px); 
+        }
+    }
+    @media only screen and (max-width: 480px) {
+        .cert-card {
+            width: 100%; 
+            margin: 20px auto; 
+        }
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -88,7 +101,7 @@ def get_image_base64(image_path: str) -> str:
             return base64.b64encode(img_file.read()).decode()
     return ""
 
-def display_certification_card(cert: Dict[str, str]) -> None:
+def display_certification_card(cert: Dict[str, str], column) -> None:
     """Display a single certification card with flip animation."""
     html = f"""
     <div class="cert-card">
@@ -102,11 +115,11 @@ def display_certification_card(cert: Dict[str, str]) -> None:
                 <div class="cert-title">{cert['title']}</div>
                 <div class="cert-details">Click the button below to download</div>
     """
-    st.markdown(html, unsafe_allow_html=True)
+    column.markdown(html, unsafe_allow_html=True)
     
     if os.path.exists(cert['pdf']):
         with open(cert['pdf'], "rb") as pdf_file:
-            st.download_button(
+            column.download_button(
                 label="📄 Download Certificate",
                 data=pdf_file.read(),
                 file_name=os.path.basename(cert['pdf']),
@@ -114,7 +127,7 @@ def display_certification_card(cert: Dict[str, str]) -> None:
                 key=f"download_{cert['title']}"
             )
     
-    st.markdown("""
+    column.markdown("""
             </div>
         </div>
     </div>
@@ -127,7 +140,12 @@ def render_certifications_section(certifications: List[Dict[str, str]]) -> None:
     
     load_styles()
     
-    st.markdown('<div class="cert-container">', unsafe_allow_html=True)
-    for cert in certifications:
-        display_certification_card(cert)
-    st.markdown('</div></div>', unsafe_allow_html=True)
+    # Create columns for horizontal layout
+    num_cols = len(certifications)
+    cols = st.columns(num_cols)
+    
+    # Display each certification card in a separate column
+    for i, cert in enumerate(certifications):
+        display_certification_card(cert, cols[i])
+    
+    st.markdown("</div>", unsafe_allow_html=True)

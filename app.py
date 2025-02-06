@@ -9,6 +9,8 @@ from certifications import render_certifications_section
 from contacts import display_contact_section
 from skills import skills_section
 from education import education_section
+from profile import profile_section
+from projects import project_section
 
 # Page config
 st.set_page_config(page_title="Syed Shahid Nazeer - Financial Analyst", page_icon="📊", layout="wide")
@@ -17,34 +19,53 @@ resumes = [
     {
         "title": "Data Science Resume",
         "description": "Focused on ML and AI projects",
-        "file": "resumes/resume_25v1.pdf"
+        "file": "resumes/resume_25v1.pdf",
+        "image": "images/resume_25v1.jpg"  # Corresponding JPG file
     },
     {
         "title": "Full Stack Developer",
         "description": "Web development expertise",
-        "file": "resumes/fullstack_resume.pdf"
+        "file": "resumes/resume_25v2.pdf",
+        "image": "images/resume_25v2.jpg"  # Corresponding JPG file
     },
     {
         "title": "Business Analyst",
         "description": "Analytics and insights",
-        "file": "resumes/resume_25v3i.pdf"
+        "file": "resumes/resume_25v3a.pdf",
+        "image": "images/resume_25v3a.jpg"  # Corresponding JPG file
     },
     {
         "title": "Python Developer",
         "description": "Python programming specialist",
-        "file": "resumes/python_developer_resume.pdf"
+        "file": "resumes/resume_25v3i.pdf",
+        "image": "images/resume_25v3i.jpg"  # Corresponding JPG file
     },
     {
         "title": "Machine Learning",
         "description": "ML/AI focused projects",
-        "file": "resumes/ml_resume.pdf"
+        "file": "resumes/resume_25v4b.pdf",
+        "image": "images/resume_25v4b.jpg"  # Corresponding JPG file
     },
     {
         "title": "Research Resume",
         "description": "Academic research focus",
-        "file": "resumes/research_resume.pdf"
+        "file": "resumes/resume_25v5b.pdf",
+        "image": "images/resume_25v5b.jpg"  # Corresponding JPG file
+    },
+    {
+        "title": "Another Full Stack Developer Resume",
+        "description": "Additional web development expertise",
+        "file": "resumes/resume_25v6a.pdf",
+        "image": "images/resume_25v6a.jpg"  # Corresponding JPG file
+    },
+    {
+        "title": "Another Business Analyst Resume",
+        "description": "Further analytics and insights",
+        "file": "resumes/resume_25v6i.pdf",
+        "image": "images/resume_25v6i.jpg"  # Corresponding JPG file
     }
 ]
+
 certifications = [
     {
         "title": "Data Science - By Excelr",
@@ -57,7 +78,6 @@ certifications = [
         "pdf": "certifications/Internshala(Business Analytics)_Certification.pdf"
     }
 ]
-
 # Load CSS
 def load_css():
     st.markdown("""
@@ -95,48 +115,9 @@ def set_background(image_path):
          """,
          unsafe_allow_html=True
      )
-
-# Profile section
-def profile_section():
-    st.markdown("<div class='header'><h1>Syed Shahid Nazeer</h1><h2>Financial Analyst</h2></div>", unsafe_allow_html=True)
-    st.markdown("<div id='profile' class='section'><h2>Profile</h2></div>", unsafe_allow_html=True)
-    st.write("""
-    Aspiring Financial Analyst with hands-on experience in data collection, analysis, and reporting. 
-    Proficient in Excel, Power BI, and SQL, with a strong foundation in business application skills. 
-    Skilled in providing financial analysis, handling business issues, and delivering actionable insights. 
-    Excellent communication and teamwork abilities, with a keen eye for detail and accuracy. 
-    Adept at translating complex financial data into strategic recommendations.
-    """)
-
-# Projects section
 def projects_section():
-    st.markdown("<div id='projects' class='section'><h2>Projects</h2></div>", unsafe_allow_html=True)
-    projects = [
-        {
-            "title": "Oil-Price Prediction",
-            "description": "Developed an oil price prediction app for strategic decision-making and increased profitability. Mined over 35 years of oil price data using Python and yfinance, resulting in more than 11,000 values. The app maintains a variance range of 1.2% to 2% in oil price predictions, aiding strategic planning in the oil industry.",
-            "duration": "March, 2023 - June, 2023",
-            "type": "Ai variant Internship Project"
-        },
-        {
-            "title": "Real/Fake News Detection",
-            "description": "Developed a user-friendly web app leveraging advanced Natural Language Processing (NLP) techniques. Analyzed and extracted sentiment from a dataset exceeding 80,000 articles. The app offers near-instantaneous verification of news authenticity, delivering reliable results within milliseconds.",
-            "duration": "July, 2023 - October, 2023",
-            "type": "Ai variant Internship Project"
-        },
-        {
-            "title": "Rating prediction of google play store apps",
-            "description": "Analyzed a dataset of over 100,000 app entries using Python and sklearn, experimenting with various regression algorithms and optimizing model parameters. The result was a predictive model that achieved an impressive 93% accuracy. This model has since been instrumental in helping app developers identify trending categories and improve their app development strategies.",
-            "duration": "Feb, 2022 - Jun, 2022",
-            "type": "Final Semester Project"
-        }
-    ]
-    
-    for project in projects:
-        st.markdown(f"<h3>{project['title']}</h3>", unsafe_allow_html=True)
-        st.markdown(f"<p><strong>{project['type']}</strong> | {project['duration']}</p>", unsafe_allow_html=True)
-        st.write(project["description"])
-        st.markdown("<hr>", unsafe_allow_html=True)
+    # Projects section
+    project_section()
 
 # Certifications section
 def certifications_section():
