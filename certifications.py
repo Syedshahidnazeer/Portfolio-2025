@@ -1,7 +1,6 @@
 # certifications.py
 import streamlit as st
 import os
-import base64
 from typing import List, Dict
 
 def load_styles() -> None:
@@ -57,11 +56,8 @@ def load_styles() -> None:
         transform: rotateY(180deg);
         background: #f8f9fa;
     }
-    .cert-image {
-        width: 100%;
-        height: 240px;
-        object-fit: contain;
-        border-radius: 8px;
+    .cert-symbol {
+        font-size: 64px;
         margin-bottom: 15px;
     }
     .cert-title {
@@ -94,21 +90,13 @@ def load_styles() -> None:
     </style>
     """, unsafe_allow_html=True)
 
-def get_image_base64(image_path: str) -> str:
-    """Convert image to base64 string."""
-    if os.path.exists(image_path):
-        with open(image_path, "rb") as img_file:
-            return base64.b64encode(img_file.read()).decode()
-    return ""
-
 def display_certification_card(cert: Dict[str, str], column) -> None:
     """Display a single certification card with flip animation."""
     html = f"""
     <div class="cert-card">
         <div class="cert-card-inner">
             <div class="cert-front">
-                <img src="data:image/png;base64,{get_image_base64(cert['image'])}" 
-                     class="cert-image" alt="{cert['title']}"/>
+                <span class="cert-symbol">&#127891;</span>
                 <div class="cert-title">{cert['title']}</div>
             </div>
             <div class="cert-back">
@@ -120,7 +108,7 @@ def display_certification_card(cert: Dict[str, str], column) -> None:
     if os.path.exists(cert['pdf']):
         with open(cert['pdf'], "rb") as pdf_file:
             column.download_button(
-                label="📄 Download Certificate",
+                label="&#128194; Download Certificate",
                 data=pdf_file.read(),
                 file_name=os.path.basename(cert['pdf']),
                 mime="application/octet-stream",
@@ -135,10 +123,18 @@ def display_certification_card(cert: Dict[str, str], column) -> None:
 
 def render_certifications_section(certifications: List[Dict[str, str]]) -> None:
     """Render the entire certifications section with animated cards."""
+    
+    # **Temporary Adjustment for Debugging**
+    st.write("---- **Before Custom Styles and Content** ----")
+    st.write(f"Navbar Should be Visible Here: {st.session_state.selected}")
+    
     st.markdown("<div class='cert-section'>", unsafe_allow_html=True)
     st.header("Certifications")
     
+    # **Apply Custom Styles**
     load_styles()
+    st.write("---- **After Applying Custom Styles** ----")
+    st.write(f"Navbar Visibility After Styles: {st.session_state.selected}")
     
     # Create columns for horizontal layout
     num_cols = len(certifications)
@@ -149,3 +145,5 @@ def render_certifications_section(certifications: List[Dict[str, str]]) -> None:
         display_certification_card(cert, cols[i])
     
     st.markdown("</div>", unsafe_allow_html=True)
+    st.write("---- **After Rendering Content** ----")
+    st.write(f"Final Navbar Visibility: {st.session_state.selected}")
