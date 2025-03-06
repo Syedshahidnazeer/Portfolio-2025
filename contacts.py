@@ -1,101 +1,147 @@
 import streamlit as st
 import os
-from typing import Dict, List
-
-def load_resume_styles() -> None:
-    """Load custom CSS styles for the resume cards with 3 columns layout."""
+from typing import List, Dict, Optional
+from datetime import datetime
+import base64
+    # Sample resume data structure
+sample_resumes = [
+    {
+        "title": "Data Science",
+        "description": "Resume tailored for Data Science roles.",
+        "file": "resumes/data_science_resume.pdf",
+        "date": "2023-01-15"
+    },
+    {
+        "title": "Full Stack Developer",
+        "description": "Resume tailored for Full Stack Development roles.",
+        "file": "resumes/full_stack_resume.pdf",
+        "date": "2022-11-05"
+    },
+    {
+        "title": "Business Analyst",
+        "description": "Resume tailored for Business Analyst roles.",
+        "file": "resumes/business_analyst_resume.pdf",
+        "date": "2021-09-20"
+    },
+    {
+        "title": "Machine Learning Engineer",
+        "description": "Resume tailored for Machine Learning Engineering roles.",
+        "file": "resumes/machine_learning_resume.pdf",
+        "date": "2023-03-10"
+    },
+    {
+        "title": "Data Analyst",
+        "description": "Resume tailored for Data Analyst roles.",
+        "file": "resumes/data_analyst_resume.pdf",
+        "date": "2022-07-22"
+    },
+    {
+        "title": "Software Developer",
+        "description": "Resume tailored for Software Development roles.",
+        "file": "resumes/software_developer_resume.pdf",
+        "date": "2021-05-14"
+    },
+    {
+        "title": "AI Researcher",
+        "description": "Resume tailored for AI Research roles.",
+        "file": "resumes/ai_researcher_resume.pdf",
+        "date": "2023-02-01"
+    },
+    {
+        "title": "DevOps Engineer",
+        "description": "Resume tailored for DevOps Engineering roles.",
+        "file": "resumes/devops_engineer_resume.pdf",
+        "date": "2022-04-18"
+    }
+]
+    
+# Function to load custom CSS styles
+def load_styles() -> None:
+    """Load custom CSS styles for the contact section."""
     st.markdown("""
-    <style>
-    .resume-section {
-        padding: 20px;
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-    .resume-container {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr); /* Changed to 3 columns */
-        gap: 25px;
-        margin-top: 20px;
-        justify-items: center;
-    }
-    .resume-card {
-        width: 100%;
-        max-width: 320px; /* Adjusted max-width for 3 columns */
-        height: 300px;
-        perspective: 1500px;
-        margin-bottom: 20px;
-    }
-    .resume-card {
-        width: 100%;
-        max-width: 500px;
-        height: 300px;
-        perspective: 1500px;
-        margin-bottom: 20px;
-    }
-    .resume-card-inner {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        text-align: center;
-        transition: transform 0.8s;
-        transform-style: preserve-3d;
-        cursor: pointer;
-    }
-    .resume-card:hover .resume-card-inner {
-        transform: rotateY(180deg);
-    }
-    .resume-front, .resume-back {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        backface-visibility: hidden;
-        border-radius: 15px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        background: white;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 15px;
-    }
-    .resume-back {
-        transform: rotateY(180deg);
-        background: #f8f9fa;
-    }
-    .resume-icon {
-        font-size: 64px;
-        margin-bottom: 15px;
-        color: #2c3e50;
-    }
-    .resume-title {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #2c3e50;
-        margin: 10px 0;
-        text-align: center;
-    }
-    .resume-description {
-        font-size: 0.9rem;
-        color: #666;
-        text-align: center;
-        margin-top: 10px;
-    }
-    .stDownloadButton {
-        margin-top: 15px !important;
-    }
-    @media (max-width: 1200px) { /* Adjusted breakpoint for 3 columns */
-        .resume-container {
-            grid-template-columns: repeat(2, 1fr);
+        <style>
+        /* Contact Section Styling */
+        .contact-info {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--secondary-background-color);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
         }
-    }
-    @media (max-width: 768px) {
-        .resume-container {
-            grid-template-columns: 1fr;
+        .contact-info:hover {
+            transform: translateY(-5px);
         }
-    }
-    </style>
+        .contact-info p {
+            font-size: 16px;
+            color: var(--text-color);
+            margin: 10px 0;
+        }
+        .contact-info a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .contact-info a:hover {
+            color: var(--secondary-color);
+        }
+        </style>
     """, unsafe_allow_html=True)
 
+# Function to create a PDF preview link
+def get_pdf_display_link(pdf_path: str) -> str:
+    """Create a base64 encoded link to preview a PDF file."""
+    try:
+        with open(pdf_path, "rb") as f:
+            base64_pdf = base64.b64encode(f.read()).decode('utf-8')
+        
+        # Create a data URL for the PDF
+        pdf_display = f'<embed src="data:application/pdf;base64,{base64_pdf}" width="700" height="500" type="application/pdf">'
+        return pdf_display
+    except Exception as e:
+        st.error(f"Error generating PDF preview: {e}")
+        return ""
+
+# Function to render an individual resume card
+def render_resume_card(resume: Dict[str, str], show_detailed: bool = False) -> None:
+    """Render an individual resume card."""
+    with st.container():
+        # Icon or placeholder
+        icon = get_icon_for_resume(resume['title'])
+        st.markdown(f"**{icon} {resume['title']}**")
+        
+        # Description
+        if 'description' in resume:
+            st.markdown(resume['description'])
+        
+        # Preview and download buttons
+        col1, col2 = st.columns(2)
+        
+        if os.path.exists(resume['file']):
+            # Preview button
+            if col1.button("Preview Resume", key=f"preview_{resume['title'].replace(' ', '_')}"):
+                pdf_display = get_pdf_display_link(resume['file'])
+                if pdf_display:
+                    st.markdown(pdf_display, unsafe_allow_html=True)
+                else:
+                    st.error("Could not generate preview.")
+            
+            # Download button
+            with open(resume['file'], "rb") as file:
+                col2.download_button(
+                    label="Download Resume",
+                    data=file,
+                    file_name=os.path.basename(resume['file']),
+                    mime="application/pdf",
+                    key=f"dl_{resume['title'].replace(' ', '_')}",
+                    use_container_width=True
+                )
+        else:
+            st.error(f"Resume file not found: {resume['file']}")
+
+# Function to select an appropriate icon based on resume title
 def get_icon_for_resume(title: str) -> str:
     """Select an appropriate icon based on resume title."""
     icons = {
@@ -107,47 +153,15 @@ def get_icon_for_resume(title: str) -> str:
     }
     return icons.get(title, "📄")
 
-def display_resume_card(resume: Dict[str, str]) -> None:
-    """Display a single resume card with flip animation."""
-    icon = get_icon_for_resume(resume['title'])
+# Main function to render the contact section
+def render_contact_section(resumes: List[Dict[str, str]]) -> None:
+    """Render the enhanced contact section with all features."""
+    st.markdown("<div id='contact' class='section fade-in'>", unsafe_allow_html=True)
+    st.header("📞 Contact Me")
+    st.write("Feel free to reach out to me through the following channels.")
     
-    html = f"""
-    <div class="resume-card">
-        <div class="resume-card-inner">
-            <div class="resume-front">
-                <div class="resume-icon">{icon}</div>
-                <div class="resume-title">{resume['title']}</div>
-                <div class="resume-description">{resume.get('description', '')}</div>
-            </div>
-            <div class="resume-back">
-                <div class="resume-title">{resume['title']}</div>
-                <div class="resume-description">Click to download</div>
-    """
-    st.markdown(html, unsafe_allow_html=True)
-    
-    if os.path.exists(resume['file']):
-        with open(resume['file'], "rb") as pdf_file:
-            st.download_button(
-                label="📄 Download Resume",
-                data=pdf_file.read(),
-                file_name=os.path.basename(resume['file']),
-                mime="application/octet-stream",
-                key=f"download_resume_{resume['title']}"
-            )
-    else:
-        st.warning(f"Resume file not found: {resume['file']}")
-    
-    st.markdown("""
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-def display_contact_section(resumes: List[Dict[str, str]]) -> None:
-    """Display contact information and resume showcase together."""
-    load_resume_styles()
-    
-    st.markdown("<div id='contact' class='section'><h2>Contact</h2></div>", unsafe_allow_html=True)
+    # Load custom styles
+    load_styles()
     
     # Contact Information
     st.markdown("""
@@ -160,26 +174,63 @@ def display_contact_section(resumes: List[Dict[str, str]]) -> None:
     """, unsafe_allow_html=True)
     
     # Resume Showcase
-    st.markdown("<div class='resume-section'>", unsafe_allow_html=True)
-    st.header("My Resumes")
+    st.markdown("---")
+    st.subheader("📋 My Resumes")
+    st.write("Explore my professional resumes tailored for different roles.")
     
-    # Create a 3-column layout
-    num_cols = 3
-    cols = st.columns(num_cols)
+    # Filters and search section
+    search_query = st.text_input("🔍 Search resumes", key="resume_search", help="Search by title or description")
     
-    # Calculate the number of rows needed
-    num_rows = -(-len(resumes) // num_cols)  # Ceiling division
+    col1, col2 = st.columns(2)
+    with col1:
+        selected_titles = st.multiselect("Filter by Title", options=sorted({resume['title'] for resume in resumes}))
     
-    # Display resumes in a 3-column layout
-    for i in range(num_rows):
-        for j in range(num_cols):
-            index = i * num_cols + j
-            if index < len(resumes):
-                with cols[j]:
-                    display_resume_card(resumes[index])
-            else:
-                # Empty column if no more resumes
-                with cols[j]:
-                    st.empty()
+    with col2:
+        sort_option = st.selectbox("Sort by", options=["Most Recent", "Alphabetical"])
     
-    st.markdown("</div>", unsafe_allow_html=True)
+    # Display mode
+    view_mode = st.radio("View Mode", ["Grid View", "Detailed View"], horizontal=True)
+    
+    # Apply filters and search
+    filtered_resumes = resumes.copy()
+    
+    if search_query:
+        filtered_resumes = [
+            resume for resume in filtered_resumes if 
+            search_query.lower() in resume['title'].lower() or
+            ('description' in resume and search_query.lower() in resume['description'].lower())
+        ]
+    
+    if selected_titles:
+        filtered_resumes = [
+            resume for resume in filtered_resumes if 
+            resume['title'] in selected_titles
+        ]
+    
+    # Sort resumes
+    if sort_option == "Most Recent":
+        filtered_resumes = sorted(filtered_resumes, key=lambda x: datetime.strptime(x.get('date', '2000-01-01'), "%Y-%m-%d"), reverse=True)
+    elif sort_option == "Alphabetical":
+        filtered_resumes = sorted(filtered_resumes, key=lambda x: x['title'])
+    
+    # Display filtered resumes
+    if not filtered_resumes:
+        st.info("No resumes match your search criteria. Try adjusting your filters.")
+    else:
+        st.write(f"Displaying {len(filtered_resumes)} resume(s)")
+        
+        if view_mode == "Grid View":
+            # Display in grid view (3 columns)
+            num_cols = 3
+            rows = [filtered_resumes[i:i + num_cols] for i in range(0, len(filtered_resumes), num_cols)]
+            
+            for row in rows:
+                cols = st.columns(num_cols)
+                for i, resume in enumerate(row):
+                    with cols[i]:
+                        render_resume_card(resume, show_detailed=False)
+        else:
+            # Display in detailed view (1 column)
+            for resume in filtered_resumes:
+                render_resume_card(resume, show_detailed=True)
+                st.markdown("---")
