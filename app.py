@@ -44,39 +44,6 @@ def load_base_css():
     with open("styles.css") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-# Dark/Light Mode Toggle
-def theme_toggle():
-    if 'theme_mode' not in st.session_state:
-        st.session_state.theme_mode = "light"
-
-    def toggle_theme():
-        st.session_state.theme_mode = "dark" if st.session_state.theme_mode == "light" else "light"
-
-    # Smooth transition effect
-    st.markdown("""
-    <style>
-    .theme-toggle {
-        background-color: var(--primary-color);
-        color: white;
-        border: none;
-        padding: 0.5rem 1rem;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-    .theme-toggle:hover {
-        background-color: #ff6ec7;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-    st.button("Toggle Theme", on_click=toggle_theme, key="theme_toggle_button")
-
-    if st.session_state.theme_mode == "dark":
-        st.markdown('<style>:root { --primary-color: #FF4B4B; --background-color: #0E1117; }</style>', unsafe_allow_html=True)
-    else:
-        st.markdown('<style>:root { --primary-color: #1e3c72; --background-color: #ffffff; }</style>', unsafe_allow_html=True)
-
 # Define callback for navbar selection
 def on_navbar_change():
     st.session_state.navbar_key += 1
@@ -115,9 +82,6 @@ def main():
         # Update session state with current selection
         st.session_state.selected = selected
         st.markdown('</div>', unsafe_allow_html=True)
-
-    # Add Dark/Light Mode Toggle
-    theme_toggle()
 
     # Social Media Links with Hover Effects
     st.markdown("""

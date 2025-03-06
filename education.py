@@ -154,7 +154,3 @@ def education_section():
         st.write("**GPA**: 8.8")
         st.write("**Description**: In secondary school, I excelled in my studies, particularly in subjects like Mathematics and Science, which laid the groundwork for my future academic pursuits.")
     st.markdown("<hr>", unsafe_allow_html=True)
-
-# Example usage
-if __name__ == "__main__":
-    education_section()
