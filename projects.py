@@ -1,163 +1,155 @@
 import streamlit as st
+import os
 from typing import List, Dict
 from datetime import datetime
+import base64
+from io import BytesIO
 
 # Function to load custom CSS styles
-def load_styles() -> None:
+def load_styles():
     """Load custom CSS styles for the projects section."""
     st.markdown("""
-        <style>
-        /* Project Card Styling */
-        .project-card {
-            border: 1px solid var(--accent-color);
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            background-color: var(--secondary-background-color);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            display: flex;
-            align-items: flex-start;
-        }
-        .project-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
-        }
+    <style>
+    /* Project Card Styling */
+    .project-card {
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .project-card:hover {
+        transform: scale(1.02);
+        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+    }
 
-        /* Project Icon */
-        .project-icon {
-            width: 50px;
-            height: 50px;
-            margin-right: 15px;
-            flex-shrink: 0;
-        }
-
-        /* Project Title */
-        .project-title {
-            font-size: 20px;
-            color: var(--primary-color);
-            margin-bottom: 5px;
-        }
-
-        /* Project Type and Duration */
-        .project-type-duration {
-            font-size: 14px;
-            color: var(--text-color);
-            margin-bottom: 10px;
-        }
-
-        /* Project Description */
-        .project-description {
-            font-size: 16px;
-            color: var(--text-color);
-            line-height: 1.6;
-        }
-
-        /* Filter Buttons */
-        .filter-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 2rem;
-        }
-        .filter-button {
-            padding: 10px 15px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .filter-button:hover {
-            background-color: var(--secondary-color);
-        }
-        </style>
+    /* File Download Button Styling */
+    .download-button {
+        background-color: #02ab21;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    .download-button:hover {
+        background-color: #ff6ec7;
+    }
+    </style>
     """, unsafe_allow_html=True)
 
+# Function to create a download link for files
+def get_file_download_link(file_path: str, label: str):
+    """Create a download link for a file."""
+    try:
+        with open(file_path, "rb") as file:
+            file_bytes = file.read()
+        b64 = base64.b64encode(file_bytes).decode()
+        href = f'<a href="data:application/octet-stream;base64,{b64}" download="{os.path.basename(file_path)}" class="download-button">{label}</a>'
+        return href
+    except Exception as e:
+        st.error(f"Error generating download link: {e}")
+        return ""
+
 # Function to render an individual project card
-def render_project_card(project: Dict[str, str], show_detailed: bool = False) -> None:
+def render_project_card(project: Dict[str, str]):
     """Render an individual project card."""
     with st.container():
-        # Logo or placeholder
-        if 'icon' in project and project['icon']:
-            st.image(project['icon'], width=50)
+        st.markdown(f"<div class='project-card'>", unsafe_allow_html=True)
+        
+        # Title and description
+        st.markdown(f"### {project['title']}", unsafe_allow_html=True)
+        st.markdown(f"**Description:** {project['description']}")
+        
+        # Categories (badges)
+        if 'categories' in project and project['categories']:
+            badges_html = " ".join([f"<span style='background-color: #02ab21; color: white; padding: 5px 10px; border-radius: 5px;'>{category}</span>" for category in project['categories']])
+            st.markdown(f"{badges_html}", unsafe_allow_html=True)
+        
+        # Skills covered
+        if 'skills' in project and project['skills']:
+            skills_list = ", ".join(project['skills'])
+            st.markdown(f"**Skills:** {skills_list}")
+        
+        # Links to code files, PPT, and video presentation
+        st.markdown("#### Project Resources")
+        col1, col2, col3 = st.columns(3)
+        
+        # Code file download
+        if 'code_file' in project and os.path.exists(project['code_file']):
+            with col1:
+                st.markdown(get_file_download_link(project['code_file'], "Download Code"), unsafe_allow_html=True)
         else:
-            st.markdown("📁", unsafe_allow_html=True)
+            with col1:
+                st.info("No code file available.")
         
-        # Title and basic info
-        st.markdown(f"**{project['title']}**")
-        st.markdown(f"{project['type']} | {project['duration']}")
+        # PowerPoint presentation download
+        if 'ppt_file' in project and os.path.exists(project['ppt_file']):
+            with col2:
+                st.markdown(get_file_download_link(project['ppt_file'], "Download PPT"), unsafe_allow_html=True)
+        else:
+            with col2:
+                st.info("No PowerPoint presentation available.")
         
-        # Description
-        if 'description' in project:
-            st.markdown(project['description'])
+        # Video presentation download or embed
+        if 'video_url' in project and project['video_url']:
+            with col3:
+                st.video(project['video_url'])
+        elif 'video_file' in project and os.path.exists(project['video_file']):
+            with col3:
+                st.video(project['video_file'])
+        else:
+            with col3:
+                st.info("No video presentation available.")
         
-        # Tags (skills)
-        if 'tags' in project and project['tags']:
-            tags_list = " | ".join([f"`{tag}`" for tag in project['tags']])
-            st.markdown(f"**Tags:** {tags_list}")
+        st.markdown("</div>", unsafe_allow_html=True)
 
 # Main function to render the projects section
-def render_projects_section(projects: List[Dict[str, str]]) -> None:
-    """Render the enhanced projects section with all features."""
-    st.markdown("<div id='projects' class='section fade-in'>", unsafe_allow_html=True)
-    st.header("📂 My Projects")
-    st.write("Explore my professional projects and contributions.")
+def render_projects_section(projects: List[Dict[str, str]]):
+    """Render the projects section."""
+    st.markdown(" ", unsafe_allow_html=True)
+    st.header("🚀 My Projects")
+    st.write("Explore my projects and their associated resources.")
     
     # Load custom styles
     load_styles()
     
-    # Extract all unique tags and types for filtering
-    all_tags = sorted(list(set(tag for project in projects for tag in project.get('tags', []))))
-    all_types = sorted(list(set(project['type'] for project in projects)))
+    # Extract all unique categories for filtering
+    all_categories = []
+    for project in projects:
+        if 'categories' in project:
+            all_categories.extend(project['categories'])
+    all_categories = sorted(list(set(all_categories)))
     
     # Filters and search section
-    search_query = st.text_input("🔍 Search projects", key="project_search", help="Search by title, type, or tags")
+    st.markdown(" ", unsafe_allow_html=True)
     
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        selected_tags = st.multiselect("Filter by Tag", options=all_tags, help="Select one or more tags")
-    with col2:
-        selected_types = st.multiselect("Filter by Type", options=all_types, help="Select one or more types")
-    with col3:
-        sort_option = st.selectbox("Sort by", options=["Most Recent", "Alphabetical"], help="Choose how to sort projects")
+    # Search functionality
+    search_query = st.text_input("🔍 Search projects", key="project_search", help="Search by title, category, or skills")
     
-    # Display mode
-    view_mode = st.radio("View Mode", ["Grid View", "Detailed View"], horizontal=True)
+    # Filter options
+    selected_categories = st.multiselect("Filter by Category", options=all_categories, help="Select one or more categories")
     
     # Apply filters and search
     filtered_projects = projects.copy()
     
+    # Filter by search query
     if search_query:
         filtered_projects = [
             project for project in filtered_projects if 
             search_query.lower() in project['title'].lower() or
-            ('type' in project and search_query.lower() in project['type'].lower()) or
-            ('tags' in project and any(search_query.lower() in tag.lower() for tag in project['tags']))
+            ('categories' in project and any(search_query.lower() in category.lower() for category in project['categories'])) or
+            ('skills' in project and any(search_query.lower() in skill.lower() for skill in project['skills']))
         ]
     
-    if selected_tags:
+    # Filter by categories
+    if selected_categories:
         filtered_projects = [
             project for project in filtered_projects if 
-            'tags' in project and any(tag in selected_tags for tag in project['tags'])
+            'categories' in project and any(category in selected_categories for category in project['categories'])
         ]
-    
-    if selected_types:
-        filtered_projects = [
-            project for project in filtered_projects if 
-            'type' in project and project['type'] in selected_types
-        ]
-    
-    # Sort projects
-    if sort_option == "Most Recent":
-        filtered_projects = sorted(
-            filtered_projects,
-            key=lambda x: datetime.strptime(x['duration'].split(" - ")[0], "%B, %Y"),
-            reverse=True
-        )
-    elif sort_option == "Alphabetical":
-        filtered_projects = sorted(filtered_projects, key=lambda x: x['title'])
     
     # Display filtered projects
     if not filtered_projects:
@@ -165,21 +157,9 @@ def render_projects_section(projects: List[Dict[str, str]]) -> None:
     else:
         st.write(f"Displaying {len(filtered_projects)} project(s)")
         
-        if view_mode == "Grid View":
-            # Display in grid view (3 columns)
-            num_cols = 3
-            rows = [filtered_projects[i:i + num_cols] for i in range(0, len(filtered_projects), num_cols)]
-            
-            for row in rows:
-                cols = st.columns(num_cols)
-                for i, project in enumerate(row):
-                    with cols[i]:
-                        render_project_card(project, show_detailed=False)
-        else:
-            # Display in detailed view (1 column)
-            for project in filtered_projects:
-                render_project_card(project, show_detailed=True)
-                st.markdown("---")
+        for project in filtered_projects:
+            render_project_card(project)
+            st.markdown("---")
 
 # Sample project data structure
 sample_projects = [

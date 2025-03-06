@@ -442,10 +442,10 @@ def render_certifications_section(certifications: List[Dict[str, str]]) -> None:
 sample_certifications = [
     {
         "title": "Data Science - By Excelr",
-        "pdf": "certifications/Excelr(Data Science)_Certification.pdf"
+        "pdf": "Certifications/Excelr(Data Science)_Certification.pdf"
     },
     {
         "title": "Business Analytics - Internshala",
-        "pdf": "certifications/Internshala(Business Analytics)_Certification.pdf"
+        "pdf": "Certifications/Internshala(Business Analytics)_Certification.pdf"
     }
 ]
