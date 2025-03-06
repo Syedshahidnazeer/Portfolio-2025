@@ -152,12 +152,10 @@ def profile_section():
                 
                 # Display images in columns
                 with cols[i % num_cols]:
-                    st.markdown(f"""
-                    <div class='image-card'>
-                        <img src='{img_path}' alt='Image {i+1}'>
-                        <p style='margin-top: 10px;'>Image {i+1}</p>
-                    </div>
-                    """, unsafe_allow_html=True)
+                    if os.path.exists(img_path):
+                        st.image(img_path, caption=f"Image {i+1}", use_column_width=True)
+                    else:
+                        st.error(f"Image not found: {img_path}")
         else:
             st.info("No images found in the 'images' directory.")
     else:
