@@ -79,11 +79,16 @@ def load_and_optimize_image(image_path, max_width=800, quality=85, format="WEBP"
             logger.error(f"Failed to load original image {image_path}: {fallback_error}")
             return None
 
-def display_optimized_image(image_path, caption=None, width=None, use_column_width="auto"):
+def display_optimized_image(image_path, caption=None, width=None, use_container_width=False):
     """Display an optimized image in the Streamlit app"""
     img_bytes = load_and_optimize_image(image_path)
     if img_bytes:
-        return st.image(img_bytes, caption=caption, width=width, use_column_width=use_column_width)
+        return st.image(
+            img_bytes,
+            caption=caption,
+            width=width,
+            use_container_width=use_container_width  # Updated parameter
+        )
     else:
         st.error(f"Failed to load image: {image_path}")
         return None
@@ -94,23 +99,28 @@ def display_responsive_image(image_path, mobile_width=300, desktop_width=None, c
     
     device = get_device_type()
     width = mobile_width if device == "mobile" else desktop_width
-    use_column_width = width is None
+    use_container_width = width is None  # Use container width if no specific width is set
     
     return display_optimized_image(
         image_path, 
         caption=caption,
         width=width,
-        use_column_width="auto" if use_column_width else None
+        use_container_width=use_container_width  # Updated parameter
     )
 
-def display_remote_image(image_url, caption=None, width=None, use_column_width="auto"):
+def display_remote_image(image_url, caption=None, width=None, use_container_width=False):
     """Display a remote image in the Streamlit app"""
     try:
         import requests
         response = requests.get(image_url)
         if response.status_code == 200:
             img_bytes = response.content
-            return st.image(img_bytes, caption=caption, width=width, use_column_width=use_column_width)
+            return st.image(
+                img_bytes,
+                caption=caption,
+                width=width,
+                use_container_width=use_container_width  # Updated parameter
+            )
         else:
             st.error(f"Failed to load remote image: {image_url}")
             return None

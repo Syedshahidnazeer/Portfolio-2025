@@ -1,9 +1,9 @@
 import streamlit as st
 import os
-from typing import List, Dict, Optional
-from datetime import datetime
+from typing import List, Dict
 import base64
-    # Sample resume data structure
+
+# Sample resume data structure
 sample_resumes = [
     {
         "title": "Data Science",
@@ -54,41 +54,22 @@ sample_resumes = [
         "date": "2022-04-18"
     }
 ]
-    
-# Function to load custom CSS styles
-def load_styles() -> None:
-    """Load custom CSS styles for the contact section."""
-    st.markdown("""
-        <style>
-        /* Contact Section Styling */
-        .contact-info {
-            padding: 20px;
-            max-width: 800px;
-            margin: 0 auto;
-            background: var(--secondary-background-color);
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
-        .contact-info:hover {
-            transform: translateY(-5px);
-        }
-        .contact-info p {
-            font-size: 16px;
-            color: var(--text-color);
-            margin: 10px 0;
-        }
-        .contact-info a {
-            color: var(--primary-color);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-        .contact-info a:hover {
-            color: var(--secondary-color);
-        }
-        </style>
-    """, unsafe_allow_html=True)
+
+# Function to load external CSS file
+#def load_css(file_name: str):
+#    """Load an external CSS file into the Streamlit app."""
+#    with open(file_name, "r", encoding="utf-8") as f:
+#        css = f.read()
+#    st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
+
+# Function to create a binary file downloader link
+def get_binary_file_downloader_html(file_path: str, file_label: str = "File") -> str:
+    """Generate a download link for a binary file."""
+    with open(file_path, "rb") as f:
+        file_data = f.read()
+    b64 = base64.b64encode(file_data).decode()
+    href = f'<a href="data:application/octet-stream;base64,{b64}" download="{os.path.basename(file_path)}">{file_label}</a>'
+    return href
 
 # Function to create a PDF preview link
 def get_pdf_display_link(pdf_path: str) -> str:
@@ -98,16 +79,80 @@ def get_pdf_display_link(pdf_path: str) -> str:
             base64_pdf = base64.b64encode(f.read()).decode('utf-8')
         
         # Create a data URL for the PDF
-        pdf_display = f'<embed src="data:application/pdf;base64,{base64_pdf}" width="700" height="500" type="application/pdf">'
+        pdf_display = f'<embed src="data:application/pdf;base64,{base64_pdf}" width="400" height="300" type="application/pdf">'
         return pdf_display
     except Exception as e:
         st.error(f"Error generating PDF preview: {e}")
         return ""
 
+# Main function to render the contact section
+def render_contact_section(resumes: List[Dict[str, str]]) -> None:
+    """Render the simplified contact section."""
+    st.markdown("<div id='contact' class='section fade-in'>", unsafe_allow_html=True)
+
+    st.header("📞 Contact Me")
+    
+    # Contact Information
+    st.write("**Phone:** +91-9912357968")
+    st.write("**Email:** shahidnazeerds@gmail.com")
+    st.write("**Location:** Bengaluru, India")
+    
+    # Contact Form
+    with st.form("contact_form"):
+        st.subheader("Send me a message")
+        name = st.text_input("Name")
+        email = st.text_input("Email")
+        message = st.text_area("Message")
+        submit_button = st.form_submit_button("Send Message")
+        
+        if submit_button:
+            if name and email and message:
+                st.success("Thanks for your message! I'll get back to you soon.")
+                
+                # Provide a resume download link
+                resume_path = "resumes/data_science_resume.pdf"  # Default resume
+                if os.path.exists(resume_path):
+                    st.markdown(get_binary_file_downloader_html(resume_path, "Download Resume"), unsafe_allow_html=True)
+                else:
+                    st.error("Resume file not found.")
+            else:
+                st.warning("Please fill in all fields before submitting.")
+
+    # Add an interactive map
+    st.subheader("📍 My Location")
+    st.markdown("""
+    <iframe 
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3889.0746881058276!2d77.62996367466373!3d12.902918887406164!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae149516d09edd%3A0x898f1caa2b217281!2sStayvel%20PG%20for%20Gents%20%2F%20PG%20in%20Bommanhalli!5e0!3m2!1sen!2sin!4v1741743188624!5m2!1sen!2sin" 
+        width="100%" 
+        height="450" 
+        style="border:0;" 
+        allowfullscreen="" 
+        loading="lazy" 
+        referrerpolicy="no-referrer-when-downgrade">
+    </iframe>
+    """, unsafe_allow_html=True)
+
+    # Resume Showcase
+    st.markdown("---")
+    st.subheader("📋 My Resumes")
+    st.write("Explore my professional resumes tailored for different roles.")
+    
+    # Display resumes side by side
+    num_cols = 2  # Two resumes per row
+    rows = [resumes[i:i + num_cols] for i in range(0, len(resumes), num_cols)]
+    
+    for row in rows:
+        cols = st.columns(num_cols)
+        for i, resume in enumerate(row):
+            with cols[i]:
+                render_resume_card(resume)
+
 # Function to render an individual resume card
-def render_resume_card(resume: Dict[str, str], show_detailed: bool = False) -> None:
-    """Render an individual resume card."""
+def render_resume_card(resume: Dict[str, str]) -> None:
+    """Render an individual resume card with preview and download options."""
     with st.container():
+        st.markdown(f"<div class='resume-card'>", unsafe_allow_html=True)
+        
         # Icon or placeholder
         icon = get_icon_for_resume(resume['title'])
         st.markdown(f"**{icon} {resume['title']}**")
@@ -117,20 +162,17 @@ def render_resume_card(resume: Dict[str, str], show_detailed: bool = False) -> N
             st.markdown(resume['description'])
         
         # Preview and download buttons
-        col1, col2 = st.columns(2)
-        
         if os.path.exists(resume['file']):
-            # Preview button
-            if col1.button("Preview Resume", key=f"preview_{resume['title'].replace(' ', '_')}"):
-                pdf_display = get_pdf_display_link(resume['file'])
-                if pdf_display:
-                    st.markdown(pdf_display, unsafe_allow_html=True)
-                else:
-                    st.error("Could not generate preview.")
+            # Preview
+            pdf_display = get_pdf_display_link(resume['file'])
+            if pdf_display:
+                st.markdown(pdf_display, unsafe_allow_html=True)
+            else:
+                st.error("Could not generate preview.")
             
             # Download button
             with open(resume['file'], "rb") as file:
-                col2.download_button(
+                st.download_button(
                     label="Download Resume",
                     data=file,
                     file_name=os.path.basename(resume['file']),
@@ -140,6 +182,8 @@ def render_resume_card(resume: Dict[str, str], show_detailed: bool = False) -> N
                 )
         else:
             st.error(f"Resume file not found: {resume['file']}")
+        
+        st.markdown("</div>", unsafe_allow_html=True)
 
 # Function to select an appropriate icon based on resume title
 def get_icon_for_resume(title: str) -> str:
@@ -152,85 +196,3 @@ def get_icon_for_resume(title: str) -> str:
         "Machine Learning": "🤖"
     }
     return icons.get(title, "📄")
-
-# Main function to render the contact section
-def render_contact_section(resumes: List[Dict[str, str]]) -> None:
-    """Render the enhanced contact section with all features."""
-    st.markdown("<div id='contact' class='section fade-in'>", unsafe_allow_html=True)
-    st.header("📞 Contact Me")
-    st.write("Feel free to reach out to me through the following channels.")
-    
-    # Load custom styles
-    load_styles()
-    
-    # Contact Information
-    st.markdown("""
-    <div class='contact-info'>
-        <p>📧 Email: shahidnazeerda@gmail.com</p>
-        <p>📱 Phone: +91-9912357968</p>
-        <p>📍 Location: Madhapur, Hyderabad</p>
-        <p>🌐 Portfolio: <a href="https://syed-shahid-nazeer-portfolio.streamlit.app" target="_blank">https://syed-shahid-nazeer-portfolio.streamlit.app</a></p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Resume Showcase
-    st.markdown("---")
-    st.subheader("📋 My Resumes")
-    st.write("Explore my professional resumes tailored for different roles.")
-    
-    # Filters and search section
-    search_query = st.text_input("🔍 Search resumes", key="resume_search", help="Search by title or description")
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        selected_titles = st.multiselect("Filter by Title", options=sorted({resume['title'] for resume in resumes}))
-    
-    with col2:
-        sort_option = st.selectbox("Sort by", options=["Most Recent", "Alphabetical"])
-    
-    # Display mode
-    view_mode = st.radio("View Mode", ["Grid View", "Detailed View"], horizontal=True)
-    
-    # Apply filters and search
-    filtered_resumes = resumes.copy()
-    
-    if search_query:
-        filtered_resumes = [
-            resume for resume in filtered_resumes if 
-            search_query.lower() in resume['title'].lower() or
-            ('description' in resume and search_query.lower() in resume['description'].lower())
-        ]
-    
-    if selected_titles:
-        filtered_resumes = [
-            resume for resume in filtered_resumes if 
-            resume['title'] in selected_titles
-        ]
-    
-    # Sort resumes
-    if sort_option == "Most Recent":
-        filtered_resumes = sorted(filtered_resumes, key=lambda x: datetime.strptime(x.get('date', '2000-01-01'), "%Y-%m-%d"), reverse=True)
-    elif sort_option == "Alphabetical":
-        filtered_resumes = sorted(filtered_resumes, key=lambda x: x['title'])
-    
-    # Display filtered resumes
-    if not filtered_resumes:
-        st.info("No resumes match your search criteria. Try adjusting your filters.")
-    else:
-        st.write(f"Displaying {len(filtered_resumes)} resume(s)")
-        
-        if view_mode == "Grid View":
-            # Display in grid view (3 columns)
-            num_cols = 3
-            rows = [filtered_resumes[i:i + num_cols] for i in range(0, len(filtered_resumes), num_cols)]
-            
-            for row in rows:
-                cols = st.columns(num_cols)
-                for i, resume in enumerate(row):
-                    with cols[i]:
-                        render_resume_card(resume, show_detailed=False)
-        else:
-            # Display in detailed view (1 column)
-            for resume in filtered_resumes:
-                render_resume_card(resume, show_detailed=True)
-                st.markdown("---")
