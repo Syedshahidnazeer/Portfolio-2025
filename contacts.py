@@ -88,12 +88,14 @@ def get_pdf_display_link(pdf_path: str) -> str:
 # Main function to render the contact section
 def render_contact_section(resumes: List[Dict[str, str]]) -> None:
     """Render the simplified contact section."""
-    st.markdown("<div id='contact' class='section fade-in'>", unsafe_allow_html=True)
+    st.markdown("""
+    <div id='contact' class='section fade-in'>
+        <h2 style='text-align: center;'>📞 Contact Me</h2>
+    </div>
+    """, unsafe_allow_html=True)
 
-    st.header("📞 Contact Me")
-    
     # Contact Information
-    st.write("**Phone:** +91-9912357968")
+    st.markdown("<b>Phone:</b> <a href='tel:+919912357968'>+91-9912357968</a>", unsafe_allow_html=True)
     st.write("**Email:** shahidnazeerds@gmail.com")
     st.write("**Location:** Bengaluru, India")
     

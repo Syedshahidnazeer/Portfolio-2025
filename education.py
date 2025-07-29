@@ -3,6 +3,8 @@ from streamlit_lottie import st_lottie
 import requests
 import plotly.express as px
 import pandas as pd
+import base64
+import os
 
 # === Utility Functions ===
 @st.cache_data
@@ -17,36 +19,29 @@ def load_lottieurl(url):
         st.error(f"Error loading Lottie animation: {e}")
         return None
 
-def load_image(path, fallback_text="Image Unavailable"):
+@st.cache_data
+def get_image_base64(image_path):
+    """Encodes an image to base64 for embedding in HTML."""
+    try:
+        with open(image_path, "rb") as img_file:
+            return base64.b64encode(img_file.read()).decode()
+    except FileNotFoundError:
+        st.error(f"Image not found: {image_path}")
+        return ""
+
+def load_image(path):
     """Load images with error handling."""
     try:
-        return st.image(path, width=50, caption=fallback_text)
+        return st.image(path, width=50)
     except FileNotFoundError:
-        st.write(fallback_text)
+        st.write("Image Unavailable")
 
 # === Custom CSS Styling ===
 def load_styles():
     """Load custom CSS styles for the education section."""
     st.markdown("""
         <style>
-        /* Synthwave84 Font */
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-        
         /* General Styling */
-        body {
-            background-color: #2e2e2e;
-            color: #f3f3f3;
-        }
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Press Start 2P', cursive;
-            color: #ff6ec7;
-            text-shadow: 0 0 8px #ff00ff, 0 0 16px #ff00ff;
-        }
-        p {
-            font-size: 16px;
-            color: #dcdcdc;
-            line-height: 1.6;
-        }
         hr {
             border: none;
             border-top: 2px solid #ff00ff;
@@ -55,19 +50,29 @@ def load_styles():
         .header-description {
             text-align: center;
             font-size: 18px;
-            color: #dcdcdc;
             margin-bottom: 20px;
         }
-        .glow {
-            animation: glow 2s ease-in-out infinite alternate;
+        /* Education Card Styling */
+        .education-card {
+            background-color: var(--section-background-color); /* Use the same white as sections */
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 20px; /* Space between cards */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Subtle shadow */
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover */
+            display: flex; /* To align logo and text */
+            align-items: flex-start; /* Align items to the top */
         }
-        @keyframes glow {
-            from {
-                text-shadow: 0 0 4px #ff00ff, 0 0 8px #ff00ff;
-            }
-            to {
-                text-shadow: 0 0 8px #ff00ff, 0 0 12px #ff00ff;
-            }
+        .education-card:hover {
+            transform: translateY(-5px); /* Lift effect */
+            box-shadow: 0 8px 12px rgba(0,0,0,0.2); /* Enhanced shadow on hover */
+        }
+        .education-logo-container {
+            flex-shrink: 0; /* Prevent logo from shrinking */
+            margin-right: 20px; /* Space between logo and text */
+        }
+        .education-details-content {
+            flex-grow: 1; /* Allow content to take available space */
         }
         </style>
     """, unsafe_allow_html=True)
@@ -101,45 +106,62 @@ def create_education_chart(theme_mode="light"):
 def display_education_details():
     """Display detailed education information."""
     # B.Tech details
-    col1, col2 = st.columns([1, 3])
-    with col1:
-        load_image("logos/aits_logo.png", "AIT&S Logo")
-        load_image("logos/jntua_logo.png", "JNTU Anantapur Logo")
-    with col2:
-        st.write("### 🎓 B.Tech - CSE")
-        st.write("**Institution**: Annamacharya Institute Of Technology & Sciences, Kadapa")
-        st.write("**University (Affiliated)**: Jawaharlal Nehru Technological University, Anantapur")
-        st.write("**Duration**: August 2018 - August 2022")
-        st.write("**Percentage of Marks**: 67.98%")
-        st.write("**CGPA**: 6.98 | **Final Semester SGPA**: 9.18")
-        st.write("**Description**: During my undergraduate studies, I developed strong foundations in computer science and engineering principles, with a focus on software development, data structures, and algorithms.")
-    st.markdown("<hr>", unsafe_allow_html=True)
+    aits_logo_base64 = get_image_base64("logos/aits_logo.png")
+    jntua_logo_base64 = get_image_base64("logos/jntua_logo.png")
+
+    st.markdown(f"""
+    <div class="education-card">
+        <div class="education-logo-container">
+            <img src="data:image/png;base64,{aits_logo_base64}" width="50" style="margin-bottom: 10px;">
+            <img src="data:image/png;base64,{jntua_logo_base64}" width="50">
+        </div>
+        <div class="education-details-content">
+            <h3>🎓 B.Tech - CSE</h3>
+            <p><b>Institution</b>: Annamacharya Institute Of Technology & Sciences, Kadapa</p>
+            <p><b>University (Affiliated)</b>: Jawaharlal Nehru Technological University, Anantapur</p>
+            <p><b>Duration</b>: August 2018 - August 2022</p>
+            <p><b>Percentage of Marks</b>: 67.98%</p>
+            <p><b>CGPA</b>: 6.98 | <b>Final Semester SGPA</b>: 9.18</p>
+            <p><b>Description</b>: During my undergraduate studies, I developed strong foundations in computer science and engineering principles, with a focus on software development, data structures, and algorithms.</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     # Higher Secondary details
-    col1, col2 = st.columns([1, 3])
-    with col1:
-        load_image("logos/bie_ap_logo.png", "BIE AP Logo")
-    with col2:
-        st.write("### 📚 Higher Secondary - 12th Class (PCM)")
-        st.write("**Institution**: Sri Chaitanya Junior College, Kadapa")
-        st.write("**Board**: Board of Intermediate Education, Andhra Pradesh")
-        st.write("**Duration**: April 2018")
-        st.write("**Percentage of Marks**: 74.8%")
-        st.write("**Description**: In high school, I studied Physics, Chemistry, and Mathematics, which provided me with a strong analytical and problem-solving skill set.")
-    st.markdown("<hr>", unsafe_allow_html=True)
+    bie_ap_logo_base64 = get_image_base64("logos/bie_ap_logo.png")
+    st.markdown(f"""
+    <div class="education-card">
+        <div class="education-logo-container">
+            <img src="data:image/png;base64,{bie_ap_logo_base64}" width="50">
+        </div>
+        <div class="education-details-content">
+            <h3>📚 Higher Secondary - 12th Class (PCM)</h3>
+            <p><b>Institution</b>: Sri Chaitanya Junior College, Kadapa</p>
+            <p><b>Board</b>: Board of Intermediate Education, Andhra Pradesh</p>
+            <p><b>Duration</b>: April 2018</p>
+            <p><b>Percentage of Marks</b>: 74.8%</p>
+            <p><b>Description</b>: In high school, I studied Physics, Chemistry, and Mathematics, which provided me with a strong analytical and problem-solving skill set.</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     # Secondary details
-    col1, col2 = st.columns([1, 3])
-    with col1:
-        load_image("logos/bse_ap_logo.png", "BSE AP Logo")
-    with col2:
-        st.write("### 🏫 Secondary - 10th Class")
-        st.write("**Institution**: Nagarjuna Model School, Maruthinagar, Kadapa")
-        st.write("**Board**: Board of Secondary Education, Andhra Pradesh")
-        st.write("**Duration**: March 2016")
-        st.write("**GPA**: 8.8")
-        st.write("**Description**: In secondary school, I excelled in my studies, particularly in subjects like Mathematics and Science, which laid the groundwork for my future academic pursuits.")
-    st.markdown("<hr>", unsafe_allow_html=True)
+    bse_ap_logo_base64 = get_image_base64("logos/bse_ap_logo.png")
+    st.markdown(f"""
+    <div class="education-card">
+        <div class="education-logo-container">
+            <img src="data:image/png;base64,{bse_ap_logo_base64}" width="50">
+        </div>
+        <div class="education-details-content">
+            <h3>🏫 Secondary - 10th Class</h3>
+            <p><b>Institution</b>: Nagarjuna Model School, Maruthinagar, Kadapa</p>
+            <p><b>Board</b>: Board of Secondary Education, Andhra Pradesh</p>
+            <p><b>Duration</b>: March 2016</p>
+            <p><b>GPA</b>: 8.8</p>
+            <p><b>Description</b>: In secondary school, I excelled in my studies, particularly in subjects like Mathematics and Science, which laid the groundwork for my future academic pursuits.</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 def education_section():
     """Main function to render the education section."""
@@ -149,7 +171,7 @@ def education_section():
     # Section Header with Animation
     st.markdown("""
     <div id='education' class='section fade-in'>
-        <h2 class='glow' style='text-align: center; margin-bottom: 2rem;'>Education</h2>
+        <h2 style='text-align: center;'>Education</h2>
     </div>
     """, unsafe_allow_html=True)
 

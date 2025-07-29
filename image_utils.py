@@ -5,6 +5,7 @@ import io
 import os
 import hashlib
 import logging
+import base64
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -107,6 +108,25 @@ def display_responsive_image(image_path, mobile_width=300, desktop_width=None, c
         width=width,
         use_container_width=use_container_width  # Updated parameter
     )
+
+def get_image_base64(image_path: str) -> str:
+    """Converts an image file to a base64 string.
+
+    Args:
+        image_path: The path to the image file.
+
+    Returns:
+        A base64 encoded string of the image.
+    """
+    try:
+        with open(image_path, "rb") as img_file:
+            return base64.b64encode(img_file.read()).decode("utf-8")
+    except FileNotFoundError:
+        logger.error(f"Image file not found: {image_path}")
+        return ""
+    except Exception as e:
+        logger.error(f"Error encoding image {image_path} to base64: {e}")
+        return ""
 
 def display_remote_image(image_url, caption=None, width=None, use_container_width=False):
     """Display a remote image in the Streamlit app"""

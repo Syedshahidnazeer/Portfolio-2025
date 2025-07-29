@@ -109,8 +109,11 @@ def render_project_card(project: Dict[str, str]):
 # Main function to render the projects section
 def render_projects_section(projects: List[Dict[str, str]]):
     """Render the projects section."""
-    st.markdown(" ", unsafe_allow_html=True)
-    st.header("🚀 My Projects")
+    st.markdown("""
+    <div id='projects' class='section fade-in'>
+        <h2 style='text-align: center;'>🚀 My Projects</h2>
+    </div>
+    """, unsafe_allow_html=True)
     st.write("Explore my projects and their associated resources.")
     
     # Load custom styles

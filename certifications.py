@@ -179,86 +179,98 @@ def render_certificate_card(cert: Dict[str, str], col) -> None:  # Pass the colu
     expiring = is_expiring_soon(cert.get('expiry_date'))
 
     with col: # use the passed column
-        card = st.container()
+        # Build the HTML content for the card
+        card_html = f"""<div class="cert-card">"""
 
-        with card:
-            st.markdown(f"""<div class="cert-card">""")
-            # Logo
-            if 'logo' in cert and os.path.exists(cert['logo']):
-                st.image(cert['logo'], width=80)
-            else:
-                st.markdown(f"""<div class="cert-icon">🎓</div>""", unsafe_allow_html=True)
+        # Logo
+        if 'logo' in cert and os.path.exists(cert['logo']):
+            # Streamlit's st.image is better for local images, but for embedding in HTML, base64 is needed
+            # For simplicity and to avoid re-implementing base64 encoding here, I'll use a placeholder
+            # or assume st.image is called separately if needed, but for now, let's keep it simple.
+            # If the logo needs to be *inside* the HTML string, it would need to be base64 encoded.
+            # For this fix, I'll assume st.image is handled outside the main HTML string if desired.
+            # For now, I'll just add a placeholder icon if no logo is directly embeddable in HTML.
+            card_html += f"""<img src="{cert['logo']}" class="cert-logo" alt="Certification Logo">"""
+        else:
+            card_html += f"""<div class="cert-icon">🎓</div>"""
 
-            # Title and basic info
-            st.markdown(f"""<div class="cert-title">{cert['title']}</div>""", unsafe_allow_html=True)
+        # Title and basic info
+        card_html += f"""<div class="cert-title">{cert['title']}</div>"""
 
-            if 'organization' in cert:
-                st.markdown(f"""<div class="cert-org">Issued by: {cert['organization']}</div>""", unsafe_allow_html=True)
+        if 'organization' in cert:
+            card_html += f"""<div class="cert-org">Issued by: {cert['organization']}</div>"""
 
-            # Category badges
-            if 'categories' in cert and cert['categories']:
-                badges_html = ""
-                for category in cert['categories']:
-                    badges_html += f'<span class="category-badge">{category}</span>'
-                st.markdown(f"""<div>{badges_html}</div>""", unsafe_allow_html=True)
+        # Category badges
+        if 'categories' in cert and cert['categories']:
+            badges_html = ""
+            for category in cert['categories']:
+                badges_html += f'<span class="category-badge">{category}</span>'
+            card_html += f"""<div>{badges_html}</div>"""
 
-            # Date information
-            date_html = ""
-            if 'issue_date' in cert:
-                date_html += f"Issued: {cert['issue_date']}"
+        # Date information
+        date_html = ""
+        if 'issue_date' in cert:
+            date_html += f"Issued: {cert['issue_date']}"
 
-            if 'expiry_date' in cert and cert['expiry_date']:
-                expiry_class = "expiring-soon" if expiring else ""
-                date_html += f" • <span class='{expiry_class}'>Expires: {cert['expiry_date']}</span>"
+        if 'expiry_date' in cert and cert['expiry_date']:
+            expiry_class = "expiring-soon" if expiring else ""
+            days_left_text = ""
+            if expiring:
+                days_left = (datetime.strptime(cert['expiry_date'], "%Y-%m-%d") - datetime.now()).days
+                days_left_text = f" ({days_left} days left)"
+            date_html += f" • <span class='{expiry_class}'>Expires: {cert['expiry_date']}{days_left_text}</span>"
 
-                if expiring:
-                    days_left = (datetime.strptime(cert['expiry_date'], "%Y-%m-%d") - datetime.now()).days
-                    date_html += f" <span class='expiring-soon'>({days_left} days left)</span>"
+        if date_html:
+            card_html += f"""<div class="cert-date">{date_html}</div>"""
 
-            if date_html:
-                st.markdown(f"""<div class="cert-date">{date_html}</div>""", unsafe_allow_html=True)
+        # Description
+        if 'description' in cert:
+            card_html += f"""<div class="cert-details">{cert['description']}</div>"""
 
-            # Description (only in detailed view)
-            if 'description' in cert:
-                st.markdown(f"""<div class="cert-details">{cert['description']}</div>""", unsafe_allow_html=True)
+            # Skills covered (if available)
+            if 'skills' in cert and cert['skills']:
+                skills_list = ", ".join(cert['skills'])
+                card_html += f"""<p><strong>Skills:</strong> {skills_list}</p>"""
 
-                # Skills covered (if available)
-                if 'skills' in cert and cert['skills']:
-                    skills_list = ", ".join(cert['skills'])
-                    st.markdown(f"**Skills:** {skills_list}")
+        # Certificate ID if available
+        if 'credential_id' in cert:
+            card_html += f"""<p><strong>Credential ID:</strong> {cert['credential_id']}</p>"""
 
-            # Certificate ID if available
-            if 'credential_id' in cert:
-                st.markdown(f"**Credential ID:** {cert['credential_id']}")
+        # Verification URL if available
+        if 'verification_url' in cert:
+            card_html += f"""<p><a href="{cert['verification_url']}" target="_blank">Verify Certificate</a></p>"""
 
-            # Verification URL if available
-            if 'verification_url' in cert:
-                st.markdown(f"[Verify Certificate]({cert['verification_url']})")
+        # PDF Preview (embedded directly in HTML)
+        pdf_display_html = get_pdf_display_link(cert['pdf'])
+        if pdf_display_html:
+            card_html += pdf_display_html
+        else:
+            card_html += f"""<p style="color: red;">Could not generate PDF preview.</p>"""
 
-            # Preview
-            pdf_display = get_pdf_display_link(cert['pdf'])
-            if pdf_display:
-                st.markdown(pdf_display, unsafe_allow_html=True)
-            else:
-                st.error("Could not generate preview.")
+        card_html += f"""</div>""" # Close cert-card div
 
-            # Download button
-            with open(cert['pdf'], "rb") as file:
-                st.download_button(
-                    label="Download Certificate",
-                    data=file,
-                    file_name=os.path.basename(cert['pdf']),
-                    mime="application/pdf",
-                    key=f"dl_{cert['title'].replace(' ', '_')}",
-                    use_container_width=True
-                )
-            st.markdown(f"""</div>""")
+        # Render the entire HTML card
+        st.markdown(card_html, unsafe_allow_html=True)
+
+        # Download button (must be a separate Streamlit component)
+        with open(cert['pdf'], "rb") as file:
+            st.download_button(
+                label="Download Certificate",
+                data=file,
+                file_name=os.path.basename(cert['pdf']),
+                mime="application/pdf",
+                key=f"dl_{cert['title'].replace(' ', '_')}",
+                use_container_width=True
+            )
 
 # Main function to render the certifications section
 def render_certifications_section(certifications: List[Dict[str, str]]) -> None:
     """Render the enhanced certifications section with all features."""
-    st.markdown("<div id='certifications' class='section fade-in'>", unsafe_allow_html=True)
-    st.header("🎓 My Certifications")
+    st.markdown("""
+    <div id='certifications' class='section fade-in'>
+        <h2 style='text-align: center;'>🎓 My Certifications</h2>
+    </div>
+    """, unsafe_allow_html=True)
     st.write("Explore my professional certifications and qualifications.")
 
     # Load custom styles

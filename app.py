@@ -9,9 +9,12 @@ from streamlit_option_menu import option_menu
 from certifications import render_certifications_section, sample_certifications
 from contacts import render_contact_section, sample_resumes
 from skills import render_skills_section, sample_skills
+from image_utils import get_image_base64
 from education import education_section
 from profile import profile_section
 from projects import render_projects_section, sample_projects
+from experience import render_experience_section
+from experience_data import sample_experiences
 
 # Page configuration
 st.set_page_config(
@@ -60,9 +63,9 @@ def main():
         # Simple and reliable navigation
         selected = option_menu(
             menu_title=None,
-            options=["Profile", "Education", "Skills", "Projects", "Certifications", "Contact"],
-            icons=["house", "book", "gear", "code-slash", "award", "envelope"],
-            default_index=["Profile", "Education", "Skills", "Projects", "Certifications", "Contact"].index(st.session_state.selected),
+            options=["Profile", "Education", "Skills", "Projects", "Certifications", "Experience", "Contact"],
+            icons=["house", "book", "gear", "code-slash", "award", "briefcase", "envelope"],
+            default_index=["Profile", "Education", "Skills", "Projects", "Certifications", "Experience", "Contact"].index(st.session_state.selected),
             orientation="horizontal",
             styles={
                 "container": {"padding": "0", "background-color": "transparent"},
@@ -99,9 +102,8 @@ def main():
     }
     </style>
     <div class='social-links'>
-        <a href="https://linkedin.com/in/your-profile" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
-        <a href="https://github.com/your-profile" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
-        <a href="https://twitter.com/your-profile" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a>
+        <a href="https://www.linkedin.com/in/shahidnazeersyed/" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+        <a href="https://github.com/Syedshahidnazeer" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
     </div>
     """, unsafe_allow_html=True)
 
@@ -115,11 +117,13 @@ def main():
         elif st.session_state.selected == "Education":
             education_section()
         elif st.session_state.selected == "Skills":
-            render_skills_section(sample_skills)
+            render_skills_section(sample_skills, get_image_base64)
         elif st.session_state.selected == "Projects":
             render_projects_section(sample_projects)
         elif st.session_state.selected == "Certifications":
             render_certifications_section(sample_certifications)
+        elif st.session_state.selected == "Experience":
+            render_experience_section(sample_experiences)
         elif st.session_state.selected == "Contact":
             render_contact_section(sample_resumes)
         

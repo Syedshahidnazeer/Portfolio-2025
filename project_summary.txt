@@ -1,0 +1,52 @@
+
+# Project Summary: Personal Portfolio
+
+This project is a personal portfolio website built with Streamlit. It showcases the user's profile, education, skills, projects, certifications, and contact information. The application is well-structured, with different sections of the portfolio separated into individual Python modules.
+
+## Core Technologies
+
+*   **Frontend:** Streamlit
+*   **Styling:** CSS
+*   **Programming Language:** Python
+
+## File Structure
+
+### Main Application Files
+
+*   `app.py`: The main entry point of the Streamlit application. It handles the navigation and rendering of different sections.
+*   `styles.css`: Contains the global CSS styles for the application.
+*   `requirements.txt`: Lists the Python dependencies for the project.
+*   `.devcontainer/devcontainer.json`: Configuration for developing inside a container.
+*   `README.md`: The project's README file.
+
+### Python Modules (Portfolio Sections)
+
+*   `profile.py`: Renders the main profile section with a description and image gallery.
+*   `education.py`: Displays the user's educational background.
+*   `skills.py`: Showcases technical skills with logos and work samples.
+*   `projects.py`: Lists projects with descriptions and resources.
+*   `certifications.py`: Displays professional certifications.
+*   `contacts.py`: Contains contact information and a contact form.
+
+### Utility Modules
+
+*   `animations.py`: Contains functions for animations.
+*   `image_utils.py`: Provides helper functions for image handling.
+*   `lazy_loader.py`: Implements lazy loading for components.
+*   `responsive_layout.py`: Includes functions for a responsive layout.
+*   `utils.py`: Contains miscellaneous utility functions.
+*   `mindmap.py`: A separate Streamlit app to showcase MySQL queries.
+
+### Assets
+
+*   `Certifications/`: Contains certification files.
+*   `fonts/`: Contains custom fonts.
+*   `images/`: Contains images for the portfolio.
+*   `logos/`: Contains logos for skills and institutions.
+*   `resumes/`: Contains resume files.
+*   `samples/`: Contains sample work.
+
+### Other
+
+*   `__pycache__/`: Contains cached Python bytecode.
+*   `.gitattributes`: Git configuration file.

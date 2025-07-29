@@ -20,14 +20,6 @@ def profile_section():
     # Custom CSS for styling
     st.markdown("""
     <style>
-    /* Load Synthwave84 Font */
-    @font-face {
-        font-family: 'Synthwave84';
-        src: url('https://fonts.cdnfonts.com/s/20976/Synthwave84-Regular.woff') format('woff');
-        font-weight: normal;
-        font-style: normal;
-    }
-
     /* Header Styling */
     .header {
         text-align: center;
@@ -37,27 +29,6 @@ def profile_section():
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Synthwave Text Styling */
-    .synthwave-text {
-        font-family: 'Synthwave84', sans-serif;
-        color: #FF00FF; /* Neon pink for synthwave vibe */
-        text-shadow: 0 0 10px #FF00FF, 0 0 20px #FF00FF, 0 0 30px #FF00FF;
-        font-size: 2rem;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        animation: neon-glow 1.5s infinite alternate;
-    }
-
-    /* Neon Glow Animation */
-    @keyframes neon-glow {
-        from {
-            text-shadow: 0 0 10px #FF00FF, 0 0 20px #FF00FF, 0 0 30px #FF00FF;
-        }
-        to {
-            text-shadow: 0 0 20px #FF00FF, 0 0 30px #FF00FF, 0 0 40px #FF00FF, 0 0 50px #FF00FF;
-        }
     }
 
     /* Profile Description Styling */
@@ -108,19 +79,15 @@ def profile_section():
     """, unsafe_allow_html=True)
 
     # Profile Header with Synthwave84 Font
-    st.markdown("<div class='header'><h1 class='synthwave-text'>Syed Shahid Nazeer</h1></div>", unsafe_allow_html=True)
+    st.markdown("<div class='header'><h1>Syed Shahid Nazeer</h1></div>", unsafe_allow_html=True)
     
     # Profile Subtitle
-    st.markdown("<h2 style='text-align: center;'>Financial Analyst</h2>", unsafe_allow_html=True)
+    st.markdown("<h2>AI Generalist</h2>", unsafe_allow_html=True)
 
     # Profile Description
     st.markdown("""
     <div class='profile-text'>
-        Aspiring Financial Analyst with hands-on experience in data collection, analysis, and reporting. 
-        Proficient in Excel, Power BI, and SQL, with a strong foundation in business application skills. 
-        Skilled in providing financial analysis, handling business issues, and delivering actionable insights. 
-        Excellent communication and teamwork abilities, with a keen eye for detail and accuracy. 
-        Adept at translating complex financial data into strategic recommendations.
+        A versatile AI Generalist driving innovation at the forefront of intelligent system development. Mastering **Generative AI**, Large Language Models (LLMs), Natural Language Processing (NLP), and advanced Data Science, I possess proven expertise in **prompt engineering**, architecting robust Retrieval-Augmented Generation (RAG) systems, and optimizing **MLOps pipelines**. Passionate about 'Vibe Coding' to transform complex data into intuitive, high-impact AI solutions that deliver tangible real-world value.
     </div>
     """, unsafe_allow_html=True)
 
@@ -153,7 +120,7 @@ def profile_section():
                 # Display images in columns
                 with cols[i % num_cols]:
                     if os.path.exists(img_path):
-                        st.image(img_path, caption=f"Image {i+1}", use_column_width=True)
+                        st.image(img_path, use_container_width=True)
                     else:
                         st.error(f"Image not found: {img_path}")
         else:

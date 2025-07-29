@@ -1,8 +1,10 @@
 import streamlit as st
 import os
-from typing import List, Dict
+from typing import List, Dict, Callable
 from datetime import datetime
 import base64
+import nbformat
+import nbconvert
 import pandas as pd
 from PIL import Image
 sample_skills = [
@@ -178,11 +180,10 @@ def load_styles() -> None:
         <style>
         /* Skill Card Styling */
         .skill-card {
-            border: 1px solid var(--accent-color);
-            padding: 15px;
+            background-color: var(--section-background-color);
+            border-radius: 10px;
+            padding: 1.5rem;
             margin-bottom: 20px;
-            border-radius: 8px;
-            background-color: var(--secondary-background-color);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             display: flex;
@@ -193,12 +194,13 @@ def load_styles() -> None:
             box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
         }
 
-        /* Skill Icon */
-        .skill-icon {
-            width: 50px;
-            height: 50px;
-            margin-right: 15px;
+        .skill-logo-container {
             flex-shrink: 0;
+            margin-right: 20px;
+        }
+
+        .skill-details-content {
+            flex-grow: 1;
         }
 
         /* Skill Title */
@@ -245,103 +247,114 @@ def load_styles() -> None:
     """, unsafe_allow_html=True)
 
 # Function to render an individual skill card
-def render_skill_card(skill: Dict[str, str], show_detailed: bool = False) -> None:
+def render_skill_card(skill: Dict[str, str], get_image_base64: Callable, show_detailed: bool = False) -> None:
     """Render an individual skill card."""
-    with st.container():
-        # Logo or placeholder
-        if 'logo_path' in skill and os.path.exists(skill['logo_path']):
-            st.image(skill['logo_path'], width=50)
-        else:
-            st.markdown("🎓", unsafe_allow_html=True)
-        
-        # Title and basic info
-        st.markdown(f"**{skill['name']}**")
-        st.markdown(f"Version: {skill['version']}")
-        
-        # Functionality and use cases
-        st.markdown(f"**Functionality:** {skill['functionality']}")
-        st.markdown(f"**Uses in Data Science and Analytics:** {skill['use']}")
-        
-        # Work samples (if available)
-        if 'samples' in skill and skill['samples']:
-            with st.expander(f"View my {skill['name']} work samples"):
-                for sample in skill['samples']:
-                    st.subheader(sample['name'])
-                    st.write(sample['description'])
-                    
-                    # Display different types of content based on the sample type
-                    if 'file_path' in sample:
-                        if sample['file_path'].endswith(".xlsx"):
-                            try:
-                                df = pd.read_excel(sample['file_path'])
-                                st.dataframe(df)
-                                
-                                with open(sample['file_path'], "rb") as file:
-                                    st.download_button(
-                                        label="Download Excel File",
-                                        data=file,
-                                        file_name=os.path.basename(sample['file_path']),
-                                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                                    )
-                            except Exception as e:
-                                st.error(f"Error displaying Excel file: {e}")
-                        
-                        elif sample['file_path'].endswith(".py"):
-                            try:
-                                with open(sample['file_path'], "r") as file:
-                                    code = file.read()
-                                st.code(code, language="python")
-                                
-                                with open(sample['file_path'], "rb") as file:
-                                    st.download_button(
-                                        label="Download Python File",
-                                        data=file,
-                                        file_name=os.path.basename(sample['file_path']),
-                                        mime="text/plain"
-                                    )
-                            except Exception as e:
-                                st.error(f"Error displaying Python file: {e}")
-                        
-                        elif sample['file_path'].endswith(".ipynb"):
-                            try:
-                                from nbformat import read as read_notebook
-                                from nbconvert import HTMLExporter
-                                
-                                notebook_content = read_notebook(sample['file_path'], as_version=4)
-                                html_exporter = HTMLExporter()
-                                (body, _) = html_exporter.from_notebook_node(notebook_content)
-                                
-                                st.components.v1.html(body, height=600)
-                                
-                                with open(sample['file_path'], "rb") as file:
-                                    st.download_button(
-                                        label="Download Jupyter Notebook",
-                                        data=file,
-                                        file_name=os.path.basename(sample['file_path']),
-                                        mime="application/x-ipynb+json"
-                                    )
-                            except Exception as e:
-                                st.error(f"Error displaying Jupyter notebook: {e}")
-                    
-                    elif 'embed_url' in sample:
+    # Start building the HTML string for the main card content
+    card_html = f"""
+    <div class="skill-card">
+        <div class="skill-logo-container">
+    """
+    if 'logo_path' in skill and os.path.exists(skill['logo_path']):
+        logo_base64 = get_image_base64(skill['logo_path'])
+        card_html += f"""<img src="data:image/png;base64,{logo_base64}" width="50" alt="{skill['name']} Logo">"""
+    else:
+        card_html += f"""<div class="skill-icon">🎓</div>""" # Using a div for icon as per CSS
+
+    card_html += f"""
+        </div>
+        <div class="skill-details-content">
+            <div class="skill-title">{skill['name']}</div>
+            <div class="skill-version">Version: {skill['version']}</div>
+            <div class="skill-description"><b>Functionality:</b> {skill['functionality']}</div>
+            <div class="skill-description"><b>Uses in Data Science and Analytics:</b> {skill['use']}</div>
+        </div>
+    </div>
+    """
+    st.markdown(card_html, unsafe_allow_html=True)
+
+    # Handle work samples separately as they contain interactive Streamlit components
+    if 'samples' in skill and skill['samples']:
+        with st.expander(f"View my {skill['name']} work samples"):
+            for sample in skill['samples']:
+                st.subheader(sample['name'])
+                st.write(sample['description'])
+
+                # Display different types of content based on the sample type
+                if 'file_path' in sample:
+                    if sample['file_path'].endswith(".xlsx"):
                         try:
-                            iframe_code = f"""
-                            <iframe src="{sample['embed_url']}" width="100%" height="600" frameborder="0"></iframe>
-                            """
-                            st.markdown(iframe_code, unsafe_allow_html=True)
+                            df = pd.read_excel(sample['file_path'])
+                            st.dataframe(df)
+
+                            with open(sample['file_path'], "rb") as file:
+                                st.download_button(
+                                    label="Download Excel File",
+                                    data=file,
+                                    file_name=os.path.basename(sample['file_path']),
+                                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                )
                         except Exception as e:
-                            st.error(f"Error displaying Power BI dashboard: {e}")
-                    
-                    elif 'query' in sample:
-                        st.markdown("### Query Example")
-                        st.code(sample['query'], language="sql")
-                        st.markdown(f"**Description:** {sample['description']}")
+                            st.error(f"Error displaying Excel file: {e}")
+
+                    elif sample['file_path'].endswith(".py"):
+                        try:
+                            with open(sample['file_path'], "r") as file:
+                                code = file.read()
+                            st.code(code, language="python")
+
+                            with open(sample['file_path'], "rb") as file:
+                                st.download_button(
+                                    label="Download Python File",
+                                    data=file,
+                                    file_name=os.path.basename(sample['file_path']),
+                                    mime="text/plain"
+                                )
+                        except Exception as e:
+                            st.error(f"Error displaying Python file: {e}")
+
+                    elif sample['file_path'].endswith(".ipynb"):
+                        try:
+                            from nbformat import read as read_notebook
+                            from nbconvert import HTMLExporter
+
+                            notebook_content = read_notebook(sample['file_path'], as_version=4)
+                            html_exporter = HTMLExporter()
+                            (body, _) = html_exporter.from_notebook_node(notebook_content)
+
+                            st.components.v1.html(body, height=600)
+
+                            with open(sample['file_path'], "rb") as file:
+                                st.download_button(
+                                    label="Download Jupyter Notebook",
+                                    data=file,
+                                    file_name=os.path.basename(sample['file_path']),
+                                    mime="application/x-ipynb+json"
+                                )
+                        except Exception as e:
+                            st.error(f"Error displaying Jupyter notebook: {e}")
+
+                elif 'embed_url' in sample:
+                    try:
+                        iframe_code = f"""
+                        <iframe src="{sample['embed_url']}" width="100%" height="600" frameborder="0"></iframe>
+                        """
+                        st.markdown(iframe_code, unsafe_allow_html=True)
+                    except Exception as e:
+                        st.error(f"Error displaying Power BI dashboard: {e}")
+
+                elif 'query' in sample:
+                    st.markdown("### Query Example")
+                    st.code(sample['query'], language="sql")
+                    st.markdown(f"**Description:** {sample['description']}")
 
 # Main function to render the skills section
-def render_skills_section(skills: List[Dict[str, str]]) -> None:
+def render_skills_section(skills: List[Dict[str, str]], get_image_base64: Callable) -> None:
     """Render the enhanced skills section with all features."""
-    st.markdown("<div id='skills' class='section fade-in'>", unsafe_allow_html=True)
-    st.header("🛠️ My Skills")
+    st.markdown("""
+    <div id='skills' class='section fade-in'>
+        <h2 style='text-align: center;'>🛠️ My Skills</h2>
+    </div>
+    """, unsafe_allow_html=True)
     st.write("Explore my technical skills and tools expertise.")
     
     # Load custom styles
@@ -401,9 +414,9 @@ def render_skills_section(skills: List[Dict[str, str]]) -> None:
                 cols = st.columns(num_cols)
                 for i, skill in enumerate(row):
                     with cols[i]:
-                        render_skill_card(skill, show_detailed=False)
+                        render_skill_card(skill, get_image_base64=get_image_base64, show_detailed=False)
         else:
             # Display in detailed view (1 column)
             for skill in filtered_skills:
-                render_skill_card(skill, show_detailed=True)
+                render_skill_card(skill, get_image_base64=get_image_base64, show_detailed=True)
                 st.markdown("---")
