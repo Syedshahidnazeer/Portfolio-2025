@@ -3,6 +3,7 @@ import os
 from typing import List, Dict, Callable
 from datetime import datetime
 import base64
+import nbformat
 import nbconvert
 import pandas as pd
 from PIL import Image
