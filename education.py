@@ -1,24 +1,12 @@
 import streamlit as st
-from streamlit_lottie import st_lottie
 import requests
 import plotly.express as px
 import pandas as pd
 import base64
 import os
+from utils import animate_text_letter_by_letter
 
 # === Utility Functions ===
-@st.cache_data
-def load_lottieurl(url):
-    """Load Lottie animations from URL."""
-    try:
-        r = requests.get(url)
-        if r.status_code != 200:
-            return None
-        return r.json()
-    except Exception as e:
-        st.error(f"Error loading Lottie animation: {e}")
-        return None
-
 @st.cache_data
 def get_image_base64(image_path):
     """Encodes an image to base64 for embedding in HTML."""
@@ -44,28 +32,31 @@ def load_styles():
         /* General Styling */
         hr {
             border: none;
-            border-top: 2px solid #ff00ff;
+            border-top: 2px solid var(--royal-accent); /* Use royal accent color */
             margin: 20px 0;
         }
         .header-description {
             text-align: center;
             font-size: 18px;
             margin-bottom: 20px;
+            color: var(--royal-light-text); /* Use royal light text color */
         }
         /* Education Card Styling */
         .education-card {
-            background-color: var(--section-background-color); /* Use the same white as sections */
+            background-color: var(--royal-secondary-bg); /* Use royal secondary background */
             border-radius: 10px;
             padding: 1.5rem;
             margin-bottom: 20px; /* Space between cards */
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Subtle shadow */
-            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover */
+            box-shadow: 0 4px 6px var(--royal-shadow); /* Use royal shadow */
             display: flex; /* To align logo and text */
             align-items: flex-start; /* Align items to the top */
+            color: var(--royal-light-text); /* Default text color for card content */
         }
-        .education-card:hover {
-            transform: translateY(-5px); /* Lift effect */
-            box-shadow: 0 8px 12px rgba(0,0,0,0.2); /* Enhanced shadow on hover */
+        .education-card h3 {
+            color: var(--royal-accent); /* Headings in gold */
+        }
+        .education-card p b {
+            color: var(--royal-accent); /* Bold text in gold */
         }
         .education-logo-container {
             flex-shrink: 0; /* Prevent logo from shrinking */
@@ -93,12 +84,28 @@ def create_education_chart(theme_mode="light"):
         title='Academic Performance',
         labels={'SGPA': 'SGPA'},
         markers=True,
-        template="plotly_dark" if theme_mode == "dark" else "plotly"
+        template="plotly_dark" # Keep dark template as base
     )
-    fig.update_traces(hovertemplate='Year: %{x}<br>SGPA: %{y}')
+    fig.update_traces(hovertemplate='Year: %{x}<br>SGPA: %{y}', marker_color='#FFFFFF', line_color='#FFFFFF') # White markers and lines
     fig.update_layout(
         margin=dict(l=20, r=20, t=40, b=20),
-        height=300
+        height=300,
+        plot_bgcolor='rgba(0,0,0,0)', # Transparent background
+        paper_bgcolor='rgba(0,0,0,0)', # Transparent background
+        font=dict(
+            color='#FFD700' # Golden text
+        ),
+        title_font_color='#FFD700', # Golden title
+        xaxis=dict(
+            showgrid=False,
+            tickfont=dict(color='#FFD700'),
+            title_font_color='#FFD700'
+        ),
+        yaxis=dict(
+            showgrid=False,
+            tickfont=dict(color='#FFD700'),
+            title_font_color='#FFD700'
+        )
     )
     return fig
 
@@ -110,13 +117,13 @@ def display_education_details():
     jntua_logo_base64 = get_image_base64("logos/jntua_logo.png")
 
     st.markdown(f"""
-    <div class="education-card">
+    <div class="education-card card">
         <div class="education-logo-container">
             <img src="data:image/png;base64,{aits_logo_base64}" width="50" style="margin-bottom: 10px;">
             <img src="data:image/png;base64,{jntua_logo_base64}" width="50">
         </div>
         <div class="education-details-content">
-            <h3>🎓 B.Tech - CSE</h3>
+            <h3>B.Tech - CSE</h3>
             <p><b>Institution</b>: Annamacharya Institute Of Technology & Sciences, Kadapa</p>
             <p><b>University (Affiliated)</b>: Jawaharlal Nehru Technological University, Anantapur</p>
             <p><b>Duration</b>: August 2018 - August 2022</p>
@@ -130,12 +137,12 @@ def display_education_details():
     # Higher Secondary details
     bie_ap_logo_base64 = get_image_base64("logos/bie_ap_logo.png")
     st.markdown(f"""
-    <div class="education-card">
+    <div class="education-card card">
         <div class="education-logo-container">
             <img src="data:image/png;base64,{bie_ap_logo_base64}" width="50">
         </div>
         <div class="education-details-content">
-            <h3>📚 Higher Secondary - 12th Class (PCM)</h3>
+            <h3>Higher Secondary - 12th Class (PCM)</h3>
             <p><b>Institution</b>: Sri Chaitanya Junior College, Kadapa</p>
             <p><b>Board</b>: Board of Intermediate Education, Andhra Pradesh</p>
             <p><b>Duration</b>: April 2018</p>
@@ -148,12 +155,12 @@ def display_education_details():
     # Secondary details
     bse_ap_logo_base64 = get_image_base64("logos/bse_ap_logo.png")
     st.markdown(f"""
-    <div class="education-card">
+    <div class="education-card card">
         <div class="education-logo-container">
             <img src="data:image/png;base64,{bse_ap_logo_base64}" width="50">
         </div>
         <div class="education-details-content">
-            <h3>🏫 Secondary - 10th Class</h3>
+            <h3>Secondary - 10th Class</h3>
             <p><b>Institution</b>: Nagarjuna Model School, Maruthinagar, Kadapa</p>
             <p><b>Board</b>: Board of Secondary Education, Andhra Pradesh</p>
             <p><b>Duration</b>: March 2016</p>
@@ -169,26 +176,24 @@ def education_section():
     load_styles()
 
     # Section Header with Animation
-    st.markdown("""
+    st.markdown(f"""
     <div id='education' class='section fade-in'>
-        <h2 style='text-align: center;'>Education</h2>
+        <h2 style='text-align: center;'>{animate_text_letter_by_letter("Education", tag='span', delay_per_letter=0.10, animation_duration=3.5)}</h2>
+        <div class="royal-header-particles">
+            <span>🎓</span><span>📚</span><span>✏️</span><span>💡</span><span>🧠</span><span>✨</span><span>🌟</span><span>📖</span><span>🧑‍🎓</span>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
-    # Load Lottie animation and chart
-    header_animation = load_lottieurl("https://assets5.lottiefiles.com/packages/lf20_fcfjwiyb.json")
+    # Load chart
     education_chart = create_education_chart(st.session_state.get("theme_mode", "light"))
 
-    if header_animation:
-        col1, col2 = st.columns([1, 2])
-        with col1:
-            st_lottie(header_animation, height=200, key="education_header_animation")
-        with col2:
-            st.plotly_chart(education_chart, use_container_width=True)
+    # Ensure chart is always displayed
+    st.plotly_chart(education_chart, use_container_width=True)
 
     st.markdown("""
     <div class='header-description'>
-        <p>This section highlights my educational background, showcasing the institutions I've attended, the qualifications I've earned, and my academic performance over the years.</p>
+        <p style='color: var(--royal-light-text);'>This section highlights my educational background, showcasing the institutions I've attended, the qualifications I've earned, and my academic performance over the years.</p>
     </div>
     """, unsafe_allow_html=True)
     st.markdown("<hr>", unsafe_allow_html=True)

@@ -2,6 +2,7 @@ import streamlit as st
 import os
 from typing import List, Dict
 import base64
+from utils import animate_text_letter_by_letter
 
 # Sample resume data structure
 sample_resumes = [
@@ -63,13 +64,55 @@ sample_resumes = [
 #    st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
 
 # Function to create a binary file downloader link
+def load_styles() -> None:
+    """Load custom CSS styles for the contact section."""
+    st.markdown("""
+    <style>
+    /* Resume Card Styling */
+    .resume-card {
+        background-color: var(--royal-secondary-bg);
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px var(--royal-shadow);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        color: var(--royal-light-text); /* Ensure text color is light */
+    }
+    .resume-card h3 {
+        color: var(--royal-accent); /* Resume titles in gold */
+    }
+    .resume-card p {
+        color: var(--royal-light-text); /* Resume descriptions in light text */
+    }
+    .resume-card .stDownloadButton button {
+        background-color: var(--royal-accent);
+        color: var(--royal-dark);
+        font-weight: bold;
+    }
+    .resume-card .stDownloadButton button:hover {
+        background-color: #DAA520; /* Darker gold on hover */
+    }
+    .resume-card .stDownloadButton {
+        width: 100%;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+# Function to create a binary file downloader link
 def get_binary_file_downloader_html(file_path: str, file_label: str = "File") -> str:
     """Generate a download link for a binary file."""
-    with open(file_path, "rb") as f:
-        file_data = f.read()
-    b64 = base64.b64encode(file_data).decode()
-    href = f'<a href="data:application/octet-stream;base64,{b64}" download="{os.path.basename(file_path)}">{file_label}</a>'
-    return href
+    try:
+        with open(file_path, "rb") as f:
+            file_data = f.read()
+        b64 = base64.b64encode(file_data).decode()
+        href = f'<a href="data:application/octet-stream;base64,{b64}" download="{os.path.basename(file_path)}" class="btn">{file_label}</a>'
+        return href
+    except Exception as e:
+        st.error(f"Error generating download link: {e}")
+        return ""
 
 # Function to create a PDF preview link
 def get_pdf_display_link(pdf_path: str) -> str:
@@ -79,7 +122,7 @@ def get_pdf_display_link(pdf_path: str) -> str:
             base64_pdf = base64.b64encode(f.read()).decode('utf-8')
         
         # Create a data URL for the PDF
-        pdf_display = f'<embed src="data:application/pdf;base64,{base64_pdf}" width="400" height="300" type="application/pdf">'
+        pdf_display = f'<embed src="data:application/pdf;base64,{base64_pdf}" width="100%" height="300" type="application/pdf">'
         return pdf_display
     except Exception as e:
         st.error(f"Error generating PDF preview: {e}")
@@ -88,24 +131,27 @@ def get_pdf_display_link(pdf_path: str) -> str:
 # Main function to render the contact section
 def render_contact_section(resumes: List[Dict[str, str]]) -> None:
     """Render the simplified contact section."""
-    st.markdown("""
+    st.markdown(f"""
     <div id='contact' class='section fade-in'>
-        <h2 style='text-align: center;'>📞 Contact Me</h2>
+        <h2 style='text-align: center;'>{animate_text_letter_by_letter("Contact Me", tag='span', delay_per_letter=0.10, animation_duration=3.5)}</h2>
+        <div class="royal-header-particles">
+            <span>😀</span><span>😊</span><span>🤩</span><span>🥳</span><span>👍</span><span>👋</span>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
     # Contact Information
-    st.markdown("<b>Phone:</b> <a href='tel:+919912357968'>+91-9912357968</a>", unsafe_allow_html=True)
-    st.write("**Email:** shahidnazeerds@gmail.com")
-    st.write("**Location:** Bengaluru, India")
+    st.markdown("<b>Phone:</b> <a href='tel:+919912357968' style='color: var(--royal-accent); text-decoration: none;'>+91-9912357968</a>", unsafe_allow_html=True)
+    st.markdown("**Email:** <span style='color: var(--royal-light-text);'>shahidnazeerds@gmail.com</span>", unsafe_allow_html=True)
+    st.markdown("**Location:** <span style='color: var(--royal-light-text);'>Bengaluru, India</span>", unsafe_allow_html=True)
     
     # Contact Form
     with st.form("contact_form"):
-        st.subheader("Send me a message")
+        st.markdown("<h3 style='color: var(--royal-accent);'>Send me a message</h3>", unsafe_allow_html=True)
         name = st.text_input("Name")
         email = st.text_input("Email")
         message = st.text_area("Message")
-        submit_button = st.form_submit_button("Send Message")
+        submit_button = st.form_submit_button("Send Message", help="Click to send your message")
         
         if submit_button:
             if name and email and message:
@@ -121,7 +167,7 @@ def render_contact_section(resumes: List[Dict[str, str]]) -> None:
                 st.warning("Please fill in all fields before submitting.")
 
     # Add an interactive map
-    st.subheader("📍 My Location")
+    st.markdown("<h3 style='color: var(--royal-accent);'>📍 My Location</h3>", unsafe_allow_html=True)
     st.markdown("""
     <iframe 
         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3889.0746881058276!2d77.62996367466373!3d12.902918887406164!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae149516d09edd%3A0x898f1caa2b217281!2sStayvel%20PG%20for%20Gents%20%2F%20PG%20in%20Bommanhalli!5e0!3m2!1sen!2sin!4v1741743188624!5m2!1sen!2sin" 
@@ -137,8 +183,11 @@ def render_contact_section(resumes: List[Dict[str, str]]) -> None:
     # Resume Showcase
     st.markdown("---")
     st.subheader("📋 My Resumes")
-    st.write("Explore my professional resumes tailored for different roles.")
+    st.markdown("<p style='text-align: center; color: var(--royal-light-text);'>Explore my professional resumes tailored for different roles.</p>", unsafe_allow_html=True)
     
+    # Load custom styles for resume cards
+    load_styles()
+
     # Display resumes side by side
     num_cols = 2  # Two resumes per row
     rows = [resumes[i:i + num_cols] for i in range(0, len(resumes), num_cols)]
@@ -152,40 +201,27 @@ def render_contact_section(resumes: List[Dict[str, str]]) -> None:
 # Function to render an individual resume card
 def render_resume_card(resume: Dict[str, str]) -> None:
     """Render an individual resume card with preview and download options."""
-    with st.container():
-        st.markdown(f"<div class='resume-card'>", unsafe_allow_html=True)
-        
-        # Icon or placeholder
-        icon = get_icon_for_resume(resume['title'])
-        st.markdown(f"**{icon} {resume['title']}**")
-        
-        # Description
-        if 'description' in resume:
-            st.markdown(resume['description'])
-        
-        # Preview and download buttons
-        if os.path.exists(resume['file']):
-            # Preview
-            pdf_display = get_pdf_display_link(resume['file'])
-            if pdf_display:
-                st.markdown(pdf_display, unsafe_allow_html=True)
-            else:
-                st.error("Could not generate preview.")
-            
-            # Download button
-            with open(resume['file'], "rb") as file:
-                st.download_button(
-                    label="Download Resume",
-                    data=file,
-                    file_name=os.path.basename(resume['file']),
-                    mime="application/pdf",
-                    key=f"dl_{resume['title'].replace(' ', '_')}",
-                    use_container_width=True
-                )
-        else:
-            st.error(f"Resume file not found: {resume['file']}")
-        
-        st.markdown("</div>", unsafe_allow_html=True)
+    icon = get_icon_for_resume(resume['title'])
+    description_html = f"<p>{resume['description']}</p>" if 'description' in resume else ""
+
+    pdf_preview_html = ""
+    download_button_html = ""
+
+    if os.path.exists(resume['file']):
+        pdf_preview_html = get_pdf_display_link(resume['file'])
+        download_button_html = get_binary_file_downloader_html(resume['file'], "Download Resume")
+    else:
+        pdf_preview_html = "<p style='color: red;'>Resume file not found.</p>"
+
+    card_html = f"""
+    <div class='resume-card card'>
+        <h3>{icon} {resume['title']}</h3>
+        {description_html}
+        {pdf_preview_html}
+        {download_button_html}
+    </div>
+    """
+    st.markdown(card_html, unsafe_allow_html=True)
 
 # Function to select an appropriate icon based on resume title
 def get_icon_for_resume(title: str) -> str:

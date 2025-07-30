@@ -6,71 +6,49 @@ import base64
 from io import BytesIO
 from PIL import Image
 #Import Method to render PDF
-from utils import get_pdf_display_link
+from utils import get_pdf_display_link, get_binary_file_downloader_html, animate_text_letter_by_letter
 
 # Function to load custom CSS styles
 def load_styles() -> None:
     """Load custom CSS styles for the certifications section."""
     st.markdown("""
     <style>
-    /* Certifications Section Styling */
-    .cert-section {
-        padding: 20px;
-        max-width: 1200px;
-        margin: 0 auto;
-        animation: fadeIn 0.8s ease-in-out;
-    }
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
     /* Certification Card Styling */
     .cert-card {
-        background-color: var(--secondary-background-color);
+        background-color: var(--royal-secondary-bg); /* Use royal secondary background */
         border-radius: 10px;
         padding: 1.5rem;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 6px var(--royal-shadow); /* Use royal shadow */
         text-align: center;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
         height: 100%;
         display: flex;
         flex-direction: column;
-        animation: slideIn 0.5s ease-out; /* Add slide-in animation */
-    }
-    @keyframes slideIn {
-        from { transform: translateX(-50px); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-    .cert-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
     }
     .cert-icon {
         font-size: 1.8rem;
         margin-bottom: 0.5rem;
-        color: var(--primary-color);
+        color: var(--royal-accent); /* Use royal accent color */
     }
     .cert-title {
         font-weight: bold;
         margin-bottom: 0.5rem;
-        color: var(--text-color);
+        color: var(--royal-accent); /* Use royal accent color */
         font-size: 1.1rem;
     }
     .cert-org {
         font-size: 0.9rem;
-        color: var(--text-color);
+        color: var(--royal-light-text); /* Use royal light text color */
         margin-bottom: 0.5rem;
         font-style: italic;
     }
     .cert-date {
         font-size: 0.8rem;
-        color: var(--text-color-secondary);
+        color: var(--royal-light-text); /* Use royal light text color */
         margin-bottom: 0.5rem;
     }
     .cert-details {
         font-size: 0.9rem;
-        color: var(--text-color);
+        color: var(--royal-light-text); /* Use royal light text color */
         margin-bottom: 1rem;
         flex-grow: 1;
     }
@@ -80,45 +58,8 @@ def load_styles() -> None:
         margin: 0 auto 0.5rem auto;
         object-fit: contain;
     }
-    .download-cert-btn {
-        background-color: var(--primary-color);
-        color: white;
-        padding: 8px 16px;
-        border-radius: 5px;
-        text-decoration: none;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        display: inline-block;
-    }
-    .download-cert-btn:hover {
-        background-color: var(--secondary-color);
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-    .preview-cert-btn {
-        background-color: var(--secondary-color);
-        color: white;
-        padding: 8px 16px;
-        border-radius: 5px;
-        text-decoration: none;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        display: inline-block;
-        margin-bottom: 0.5rem;
-    }
-    .preview-cert-btn:hover {
-        background-color: var(--primary-color);
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-    .cert-carousel {
-        padding: 1rem;
-        border-radius: 10px;
-        background-color: rgba(0,0,0,0.03);
-        margin-bottom: 2rem;
-    }
     .expiring-soon {
-        color: #ff4500;
+        color: #ff4500; /* Keep original color for warning */
         font-weight: bold;
         animation: pulse 2s infinite;
     }
@@ -129,8 +70,8 @@ def load_styles() -> None:
     }
     .category-badge {
         display: inline-block;
-        background-color: var(--primary-color);
-        color: white;
+        background-color: var(--royal-accent); /* Use royal accent color */
+        color: var(--royal-dark); /* Use royal dark color for text */
         padding: 3px 8px;
         border-radius: 10px;
         font-size: 0.7rem;
@@ -180,7 +121,7 @@ def render_certificate_card(cert: Dict[str, str], col) -> None:  # Pass the colu
 
     with col: # use the passed column
         # Build the HTML content for the card
-        card_html = f"""<div class="cert-card">"""
+        card_html = f"""<div class="cert-card card">"""
 
         # Logo
         if 'logo' in cert and os.path.exists(cert['logo']):
@@ -253,25 +194,21 @@ def render_certificate_card(cert: Dict[str, str], col) -> None:  # Pass the colu
         st.markdown(card_html, unsafe_allow_html=True)
 
         # Download button (must be a separate Streamlit component)
-        with open(cert['pdf'], "rb") as file:
-            st.download_button(
-                label="Download Certificate",
-                data=file,
-                file_name=os.path.basename(cert['pdf']),
-                mime="application/pdf",
-                key=f"dl_{cert['title'].replace(' ', '_')}",
-                use_container_width=True
-            )
+        download_button_html = get_binary_file_downloader_html(cert['pdf'], "Download Certificate")
+        st.markdown(download_button_html, unsafe_allow_html=True)
 
 # Main function to render the certifications section
 def render_certifications_section(certifications: List[Dict[str, str]]) -> None:
     """Render the enhanced certifications section with all features."""
-    st.markdown("""
+    st.markdown(f"""
     <div id='certifications' class='section fade-in'>
-        <h2 style='text-align: center;'>🎓 My Certifications</h2>
+        <h2 style='text-align: center;'>{animate_text_letter_by_letter("My Certifications", tag='span', delay_per_letter=0.10, animation_duration=3.5)}</h2>
+        <div class="royal-header-particles">
+            <span>🏆</span><span>🏅</span><span>📜</span><span>✨</span><span>🌟</span><span>✅</span><span>💯</span><span>🎓</span><span>🥇</span>
+        </div>
     </div>
     """, unsafe_allow_html=True)
-    st.write("Explore my professional certifications and qualifications.")
+    st.markdown("<p style='text-align: center; color: var(--royal-light-text);'>Explore my professional certifications and qualifications.</p>", unsafe_allow_html=True)
 
     # Load custom styles
     load_styles()

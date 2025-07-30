@@ -1,167 +1,232 @@
 /* Import Google Fonts and Font Awesome */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@300;400;700&display=swap');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
 
-/* CSS Variables */
+/* CSS Variables - Royal Theme */
 :root {
-    --primary-color: #1e3c72;
-    --secondary-color: #2a5298;
-    --text-color: #222;             /* Darker text color */
-    --background-color: #f9fafb;     /* Lighter background color */
-    --header-text-color: white;
-    --section-background-color: #ffffff; /* Section background */
+    --royal-dark: #000033; /* Pure Royal Navy Blue */
+    --royal-accent: #FFD700; /* Gold */
+    --royal-light-text: #F0F8FF; /* AliceBlue for soft contrast */
+    --royal-secondary-bg: #00004d; /* Slightly lighter navy for secondary elements */
+    --royal-shadow: rgba(0, 0, 0, 0.6); /* Darker, more pronounced shadow */
 }
 
 /* Base Styles */
 body {
     font-family: 'Roboto', sans-serif;
-    color: var(--text-color);
+    color: var(--royal-light-text);
     line-height: 1.6;
-    background-color: var(--background-color);
+    background-color: var(--royal-dark); /* Overall background */
     margin: 0;
     padding: 0;
-    transition: all 0.3s ease;
+    transition: all 0.5s ease-in-out; /* Smooth transitions everywhere */
 }
 
-/* Header Section */
-.header {
-    text-align: center;
-    padding: 2rem 0;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    color: var(--header-text-color); /*Header text color*/
-    position: relative;
-    overflow: hidden;
-    animation: fadeIn 1s ease-out;
-}
-
-.header::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 10%, transparent 10%);
-    transform: rotate(45deg);
-    animation: spin 10s linear infinite;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-h1, h2, h3 {
+/* General Headings */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+    color: var(--royal-accent); /* Golden headings */
     margin-bottom: 1rem;
-    color: var(--primary-color);
-    animation: slideUp 0.5s ease-out;
+    animation: fadeIn 1s ease-out; /* General fade-in for headings */
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5), 0 0 10px rgba(255, 215, 0, 0.3); /* Subtle golden glow for all headings */
 }
 
-@keyframes slideUp {
-    from { transform: translateY(50px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+h2 {
+    font-size: 2rem;
+    background: linear-gradient(90deg, #FFD700 0%, #DAA520 50%, #FFD700 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: var(--royal-accent); /* Ensure text is visible */
+    background-size: 200% 100%;
 }
 
-/* Navigation Links */
-.nav-links {
-    display: flex;
-    justify-content: center;
-    list-style-type: none;
-    padding: 0;
-    margin: 1rem 0;
-    flex-wrap: wrap;
-}
-
-.nav-links li {
-    margin: 0.5rem 1rem;
-}
-
-.nav-links a {
-    color: var(--primary-color);
-    text-decoration: none;
-    font-weight: bold;
-    position: relative;
-    transition: color 0.3s ease, transform 0.3s ease;
-}
-
-.nav-links a::after {
-    content: '';
-    position: absolute;
-    bottom: -5px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background-color: var(--primary-color);
-    transition: width 0.3s ease;
-}
-
-.nav-links a:hover {
-    color: var(--secondary-color);
-    transform: scale(1.1);
-}
-
-.nav-links a:hover::after {
-    width: 100%;
-}
-
-/* Sections */
+/* Section Styling - Consistent Royal Look */
 .section {
-    margin: 2rem 0;
-    padding: 2rem;
-    background-color: var(--section-background-color); /*Section background color*/
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    animation: slideUp 0.5s ease-out;
+    margin: 2rem auto; /* Center sections */
+    padding: 2.5rem 2rem; /* Consistent padding */
+    background-color: var(--royal-secondary-bg); /* Section background */
+    border-radius: 15px;
+    box-shadow: 0 12px 25px var(--royal-shadow); /* Deeper, more regal shadow */
+    animation: fadeIn 1s ease-out;
     position: relative;
+    overflow: hidden;
+    max-width: 900px; /* Default max-width for sections */
+    border: 1px solid rgba(255, 215, 0, 0.2); /* Subtle golden border */
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInFromLeft {
+    from { opacity: 0; transform: translateX(-50px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes letterReveal {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes lightningPop {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5) rotate(0deg);
+    }
+    20% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.2) rotate(30deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(var(--x), var(--y)) scale(0) rotate(180deg);
+    }
+}
+
+.royal-header-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
     overflow: hidden;
 }
 
-.section::before {
-    content: '';
+.royal-header-particles span {
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 10%, transparent 10%);
-    transform: rotate(45deg);
-    animation: spin 15s linear infinite;
+    font-size: 25px; /* Adjust size as needed */
+    color: var(--royal-accent);
+    opacity: 0;
+    animation: lightningPop 3s ease-out infinite;
+    text-shadow: 0 0 5px var(--royal-accent), 0 0 10px var(--royal-accent);
 }
 
-/* Skill and Language Items */
-.skill-item, .language-item {
-    background-color: #e9ecef;
-    padding: 0.5rem 1rem;
-    margin: 0.5rem 0;
-    border-radius: 5px;
-    text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+/* Staggered positions and delays for particles */
+.royal-header-particles span:nth-child(1) { top: 10%; left: 20%; animation-delay: 0s; --x: 10px; --y: -10px; }
+.royal-header-particles span:nth-child(2) { top: 80%; left: 70%; animation-delay: 0.5s; --x: -15px; --y: 5px; }
+.royal-header-particles span:nth-child(3) { top: 50%; left: 5%; animation-delay: 1s; --x: 20px; --y: 10px; }
+.royal-header-particles span:nth-child(4) { top: 30%; left: 90%; animation-delay: 1.5s; --x: -10px; --y: -20px; }
+.royal-header-particles span:nth-child(5) { top: 60%; left: 40%; animation-delay: 2s; --x: 5px; --y: 15px; }
+.royal-header-particles span:nth-child(6) { top: 20%; left: 60%; animation-delay: 2.5s; --x: -20px; --y: -5px; }
+
+/* Global Particle Animations */
+@keyframes meteorFall {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+    10% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translate(var(--end-x), var(--end-y)) rotate(360deg);
+    }
 }
 
-.skill-item:hover, .language-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
-    background-color: var(--primary-color);
-    color: var(--header-text-color); /*Header text color*/
+@keyframes starTwinkle {
+    0%, 100% {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes goldenDust {
+    0% {
+        opacity: 0;
+        transform: translate(0, 0);
+    }
+    50% {
+        opacity: 0.8;
+    }
+    100% {
+        opacity: 0;
+        transform: translate(var(--drift-x), var(--drift-y));
+    }
+}
+
+.global-particles-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: -2; /* Behind everything else */
+}
+
+.golden-particle {
+    position: absolute;
+    background-color: var(--royal-accent); /* Golden color */
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Meteor Fall Particles (elongated dot) */
+.golden-particle.meteor {
+    width: 4px;
+    height: 12px;
+    border-radius: 2px; /* Slightly rounded rectangle */
+    animation: meteorFall var(--duration) ease-in-out infinite;
+    box-shadow: 0 0 5px var(--royal-accent), 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* Golden Star Particles (small dot with glow) */
+.golden-particle.star {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%; /* Circular */
+    animation: starTwinkle var(--duration) ease-in-out infinite;
+    box-shadow: 0 0 8px var(--royal-accent), 0 0 15px rgba(255, 215, 0, 0.7);
+}
+
+/* Golden Dust Particles (tiny dot) */
+.golden-particle.dust {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%; /* Circular */
+    animation: goldenDust var(--duration) ease-in-out infinite;
+    box-shadow: 0 0 3px var(--royal-accent);
+}
+
+/* Generic Card Styling */
+.card {
+    background-color: var(--royal-dark); /* Darker background for cards */
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: 0 6px 12px var(--royal-shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease; /* Added background transition */
+    border: 1px solid rgba(255, 215, 0, 0.1); /* Subtle golden border for cards */
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 25px var(--royal-accent);
+    background-color: var(--royal-secondary-bg);
 }
 
 /* Buttons */
 .btn {
     display: inline-block;
-    padding: 0.5rem 1rem;
-    background-color: var(--primary-color);
-    color: var(--header-text-color); /*Header text color*/
+    padding: 0.8rem 1.8rem;
+    background-color: var(--royal-accent); /* Golden buttons */
+    color: var(--royal-dark); /* Dark text on golden buttons */
     text-decoration: none;
-    border-radius: 5px;
-    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 8px; /* Slightly more rounded */
+    transition: all 0.3s ease; /* Smooth transitions */
     margin: 0.5rem;
     position: relative;
     overflow: hidden;
+    font-weight: bold;
+    letter-spacing: 0.05em; /* Slightly spaced out text */
+    border: none; /* Remove default border */
 }
 
 .btn::before {
@@ -171,27 +236,34 @@ h1, h2, h3 {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: rgba(255, 255, 255, 0.2);
-    transition: left 0.3s ease;
+    background: rgba(255, 255, 255, 0.3); /* Brighter shimmer */
+    transition: left 0.4s ease-in-out; /* Slower shimmer */
 }
 
 .btn:hover {
-    background-color: var(--secondary-color);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+    background-color: #DAA520; /* Darker gold on hover */
+    transform: translateY(-3px) scale(1.02); /* Lift and slight scale */
+    box-shadow: 0 10px 20px var(--royal-shadow); /* Deeper shadow */
 }
 
 .btn:hover::before {
     left: 100%;
 }
 
-/* Contact Info */
+/* Streamlit Download Button Styling */
+.stDownloadButton button span {
+    color: var(--royal-dark) !important;
+    font-weight: bold !important;
+}
+
+/* Contact Info - Ensure text is visible */
 .contact-info {
     margin-top: 1rem;
+    color: var(--royal-light-text); /* Ensure contact info text is light */
 }
 
 .contact-info a {
-    color: var(--primary-color);
+    color: var(--royal-accent); /* Golden links */
     text-decoration: none;
     transition: color 0.3s ease, transform 0.3s ease;
 }
@@ -199,21 +271,23 @@ h1, h2, h3 {
 .contact-info a:hover {
     text-decoration: underline;
     transform: scale(1.05);
+    color: #DAA520; /* Darker gold on hover */
 }
 
 /* Social Links */
 .social-links {
-    margin-top: 1rem;
+    margin-top: 1.5rem; /* More space */
     display: flex;
-    gap: 1rem;
+    gap: 1.5rem; /* More space between icons */
     justify-content: center;
 }
 
 .social-links a {
-    font-size: 1.5rem;
-    color: var(--primary-color);
-    transition: color 0.3s ease, transform 0.3s ease;
+    font-size: 2.2rem; /* Larger icons */
+    color: var(--royal-accent); /* Golden icons */
+    transition: all 0.3s ease; /* Smooth transitions */
     position: relative;
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.5); /* Initial glow */
 }
 
 .social-links a::before {
@@ -223,34 +297,99 @@ h1, h2, h3 {
     left: 50%;
     width: 0;
     height: 0;
-    background: #1e3c72;
+    background: rgba(255, 215, 0, 0.3); /* Brighter golden glow */
     border-radius: 50%;
     transform: translate(-50%, -50%);
-    transition: width 0.3s ease, height 0.3s ease;
+    transition: width 0.4s ease, height 0.4s ease, opacity 0.4s ease; /* Slower, smoother glow */
+    opacity: 0;
 }
 
 .social-links a:hover {
-    color: var(--secondary-color);
-    transform: scale(1.2);
+    color: #DAA520; /* Darker gold on hover */
+    transform: translateY(-5px) scale(1.15); /* Lift and scale */
+    text-shadow: 0 0 15px var(--royal-accent), 0 0 25px rgba(255, 215, 0, 0.8); /* More intense glow */
 }
 
 .social-links a:hover::before {
-    width: 40px;
-    height: 40px;
+    width: 55px; /* Larger hover effect */
+    height: 55px;
+    opacity: 1;
+}
+
+/* Streamlit Specific Overrides */
+.stApp {
+    background-color: var(--royal-dark); /* Ensure Streamlit app background matches */
+}
+
+/* General Text Styling for Streamlit components */
+div[data-testid="stMarkdownContainer"] p,
+div[data-testid="stMarkdownContainer"] li,
+div[data-testid="stText"],
+div[data-testid="stDataFrame"] *,
+div[data-testid="stCodeBlock"] *,
+div[data-testid="stAlert"] * {
+    color: var(--royal-light-text) !important;
+}
+
+/* General Text Input and Text Area Styling */
+div[data-testid="stTextInput"] > div > div > input,
+div[data-testid="stTextInput"] > div > div > textarea,
+div[data-testid="stTextArea"] > div > div > textarea,
+div[data-testid="stMultiSelect"] > div > div,
+div[data-testid="stSelectbox"] > div > div {
+    background-color: var(--royal-dark);
+    color: var(--royal-light-text);
+    border: 1px solid var(--royal-accent);
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    box-shadow: inset 0 0 5px rgba(255, 215, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+div[data-testid="stTextInput"] > div > div > input:focus,
+div[data-testid="stTextInput"] > div > div > textarea:focus,
+div[data-testid="stTextArea"] > div > div > textarea:focus,
+div[data-testid="stMultiSelect"] > div > div:focus-within,
+div[data-testid="stSelectbox"] > div > div:focus-within {
+    border-color: var(--royal-accent);
+    box-shadow: 0 0 10px var(--royal-accent), inset 0 0 8px rgba(255, 215, 0, 0.5);
+    outline: none;
+}
+
+/* Streamlit Labels */
+.st-emotion-cache-vk328v p {
+    color: var(--royal-light-text) !important;
+}
+
+/* Streamlit Subheader */
+.st-emotion-cache-vk328v h3 {
+    color: var(--royal-accent) !important;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .nav-links {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .nav-links li {
-        margin: 0.5rem 0;
-    }
-
     .section {
-        padding: 1rem;
+        padding: 1.5rem 1rem;
+        margin: 1rem 10px;
+    }
+    .social-links a {
+        font-size: 1.8rem;
+    }
+    .social-links a:hover::before {
+        width: 45px;
+        height: 45px;
+    }
+    h1 {
+        font-size: 2.5rem !important;
+    }
+    h2 {
+        font-size: 1.8rem !important;
+    }
+    .royal-header h1 {
+        font-size: 2.8rem !important;
+    }
+    .royal-header h2 {
+        font-size: 1.5rem !important;
     }
 }
+

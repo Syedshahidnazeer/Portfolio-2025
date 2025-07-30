@@ -125,12 +125,20 @@ def apply_responsive_styles():
             /* Adjust navbar for mobile */
             .navbar-container {
                 padding: 5px !important;
+                background-color: var(--royal-secondary-bg) !important; /* Ensure royal theme */
             }
             
             /* Custom scrollbar for mobile */
             ::-webkit-scrollbar {
                 width: 4px;
                 height: 4px;
+            }
+            ::-webkit-scrollbar-track {
+                background: var(--royal-dark); /* Royal theme scrollbar track */
+            }
+            ::-webkit-scrollbar-thumb {
+                background: var(--royal-accent); /* Royal theme scrollbar thumb */
+                border-radius: 2px;
             }
         </style>
         """, unsafe_allow_html=True)
@@ -147,6 +155,13 @@ def apply_responsive_styles():
             ::-webkit-scrollbar {
                 width: 8px;
                 height: 8px;
+            }
+            ::-webkit-scrollbar-track {
+                background: var(--royal-dark); /* Royal theme scrollbar track */
+            }
+            ::-webkit-scrollbar-thumb {
+                background: var(--royal-accent); /* Royal theme scrollbar thumb */
+                border-radius: 4px;
             }
         </style>
         """, unsafe_allow_html=True)

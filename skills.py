@@ -7,6 +7,7 @@ import nbformat
 import nbconvert
 import pandas as pd
 from PIL import Image
+from utils import animate_text_letter_by_letter
 sample_skills = [
     {
         "name": "MS Excel",
@@ -171,6 +172,118 @@ ORDER BY category, category_rank;
                 "description": "R Markdown document demonstrating statistical modeling techniques."
             }
         ]
+    },
+    {
+        "name": "Natural Language Processing",
+        "logo_path": "logos/NLP_logo.png",
+        "version": "NLTK, SpaCy",
+        "functionality": "Field of AI focused on enabling computers to understand, interpret, and generate human language.",
+        "use": "Used for sentiment analysis, text classification, machine translation, and chatbots.",
+        "samples": [
+            {
+                "name": "Sentiment Analysis",
+                "file_path": "samples/nlp/sentiment_analysis.py",
+                "description": "Python script for sentiment analysis of customer reviews using NLTK."
+            }
+        ]
+    },
+    {
+        "name": "Large Language Models",
+        "logo_path": "logos/LLM_logo.jpg",
+        "version": "GPT-3, BERT",
+        "functionality": "Advanced AI models trained on vast amounts of text data to generate human-like text.",
+        "use": "Used for content creation, summarization, question answering, and code generation.",
+        "samples": [
+            {
+                "name": "Text Generation with GPT-3",
+                "file_path": "samples/llm/text_generation.py",
+                "description": "Python script demonstrating text generation using OpenAI's GPT-3 API."
+            }
+        ]
+    },
+    {
+        "name": "Retrieval-Augmented Generation",
+        "logo_path": "logos/RAG_logo.jpg",
+        "version": "Haystack, LangChain",
+        "functionality": "AI framework that retrieves relevant information from a knowledge base to augment the generation process of LLMs.",
+        "use": "Used for building more accurate and context-aware question-answering systems and chatbots.",
+        "samples": [
+            {
+                "name": "Question Answering with RAG",
+                "file_path": "samples/rag/question_answering.py",
+                "description": "Python script implementing a RAG model for question answering over a custom dataset."
+            }
+        ]
+    },
+    {
+        "name": "Data Science",
+        "logo_path": "logos/DS_logo.jpg",
+        "version": "Various Tools",
+        "functionality": "Interdisciplinary field that uses scientific methods, processes, algorithms and systems to extract knowledge and insights from structured and unstructured data.",
+        "use": "Applied in various domains to make data-driven decisions, build predictive models, and create data products.",
+        "samples": [
+            {
+                "name": "End-to-End Data Science Project",
+                "file_path": "samples/ds/end_to_end_project.ipynb",
+                "description": "A Jupyter notebook showcasing a complete data science project from data collection to model deployment."
+            }
+        ]
+    },
+    {
+        "name": "Microsoft Certified Professional",
+        "logo_path": "logos/MCP_logo.png",
+        "version": "Varies by certification",
+        "functionality": "Demonstrates expertise in Microsoft technologies.",
+        "use": "Validates skills in areas like cloud computing (Azure), data analysis (Power BI), and more.",
+        "samples": [
+            {
+                "name": "Azure Fundamentals Certification",
+                "file_path": "Certifications/azure_fundamentals.pdf",
+                "description": "Certification demonstrating foundational knowledge of cloud services and how those services are provided with Microsoft Azure."
+            }
+        ]
+    },
+    {
+        "name": "Artificial Intelligence",
+        "logo_path": "logos/AI_logo.jpg",
+        "version": "Various Frameworks",
+        "functionality": "Broad field of computer science that gives computers the ability to perform human-like tasks.",
+        "use": "Encompasses machine learning, deep learning, natural language processing, and computer vision for intelligent systems.",
+        "samples": [
+            {
+                "name": "AI Chatbot Development",
+                "file_path": "samples/ai/chatbot.py",
+                "description": "Python script for a rule-based AI chatbot."
+            }
+        ]
+    },
+    {
+        "name": "Machine Learning",
+        "logo_path": "logos/ML_logo.png",
+        "version": "Scikit-learn, TensorFlow, Keras",
+        "functionality": "Subset of AI that enables systems to learn from data without being explicitly programmed.",
+        "use": "Used for predictive analytics, classification, regression, clustering, and recommendation systems.",
+        "samples": [
+            {
+                "name": "Customer Churn Prediction",
+                "file_path": "samples/ml/churn_prediction.ipynb",
+                "description": "Jupyter notebook demonstrating a machine learning model to predict customer churn."
+            }
+        ]
+    },
+    {
+        "name": "Deep Learning",
+        "logo_path": "logos/DL_logo.png",
+        "version": "TensorFlow, Keras, PyTorch",
+        "functionality": "Subset of machine learning that uses neural networks with many layers to learn complex patterns from data.",
+        "use": "Applied in image recognition, natural language processing, speech recognition, and autonomous driving.",
+        "samples": [
+            {
+                "name": "Image Classification with CNN",
+                "file_path": "samples/dl/image_classification.ipynb",
+                "description": "Jupyter notebook implementing a Convolutional Neural Network for image classification."
+            }
+        ]
     }
 ]
 # Function to load custom CSS styles
@@ -180,18 +293,13 @@ def load_styles() -> None:
         <style>
         /* Skill Card Styling */
         .skill-card {
-            background-color: var(--section-background-color);
+            background-color: var(--royal-secondary-bg);
             border-radius: 10px;
             padding: 1.5rem;
             margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 6px var(--royal-shadow);
             display: flex;
             align-items: flex-start;
-        }
-        .skill-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
         }
 
         .skill-logo-container {
@@ -199,28 +307,24 @@ def load_styles() -> None:
             margin-right: 20px;
         }
 
-        .skill-details-content {
-            flex-grow: 1;
-        }
-
         /* Skill Title */
         .skill-title {
             font-size: 20px;
-            color: var(--primary-color);
+            color: var(--royal-accent);
             margin-bottom: 5px;
         }
 
         /* Skill Version */
         .skill-version {
             font-size: 14px;
-            color: var(--text-color);
+            color: var(--royal-light-text);
             margin-bottom: 10px;
         }
 
         /* Skill Description */
         .skill-description {
             font-size: 16px;
-            color: var(--text-color);
+            color: var(--royal-light-text);
             line-height: 1.6;
         }
 
@@ -233,15 +337,23 @@ def load_styles() -> None:
         }
         .filter-button {
             padding: 10px 15px;
-            background-color: var(--primary-color);
-            color: white;
+            background-color: var(--royal-accent);
+            color: var(--royal-dark);
             border: none;
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
         .filter-button:hover {
-            background-color: var(--secondary-color);
+            background-color: #DAA520;
+        }
+
+        .work-sample-card {
+            background-color: var(--royal-dark);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px var(--royal-shadow);
         }
         </style>
     """, unsafe_allow_html=True)
@@ -251,7 +363,7 @@ def render_skill_card(skill: Dict[str, str], get_image_base64: Callable, show_de
     """Render an individual skill card."""
     # Start building the HTML string for the main card content
     card_html = f"""
-    <div class="skill-card">
+    <div class="skill-card card">
         <div class="skill-logo-container">
     """
     if 'logo_path' in skill and os.path.exists(skill['logo_path']):
@@ -276,6 +388,7 @@ def render_skill_card(skill: Dict[str, str], get_image_base64: Callable, show_de
     if 'samples' in skill and skill['samples']:
         with st.expander(f"View my {skill['name']} work samples"):
             for sample in skill['samples']:
+                st.markdown(f"<div class='work-sample-card'>", unsafe_allow_html=True)
                 st.subheader(sample['name'])
                 st.write(sample['description'])
 
@@ -346,16 +459,20 @@ def render_skill_card(skill: Dict[str, str], get_image_base64: Callable, show_de
                     st.markdown("### Query Example")
                     st.code(sample['query'], language="sql")
                     st.markdown(f"**Description:** {sample['description']}")
+                st.markdown(f"</div>", unsafe_allow_html=True)
 
 # Main function to render the skills section
 def render_skills_section(skills: List[Dict[str, str]], get_image_base64: Callable) -> None:
     """Render the enhanced skills section with all features."""
-    st.markdown("""
+    st.markdown(f"""
     <div id='skills' class='section fade-in'>
-        <h2 style='text-align: center;'>🛠️ My Skills</h2>
+        <h2 style='text-align: center;'>{animate_text_letter_by_letter("My Skills", tag='span', delay_per_letter=0.10, animation_duration=3.5)}</h2>
+        <div class="royal-header-particles">
+            <span>🛠️</span><span>💻</span><span>📈</span><span>🚀</span><span>💡</span><span>⚙️</span><span>🌟</span><span>✨</span><span>💪</span>
+        </div>
     </div>
     """, unsafe_allow_html=True)
-    st.write("Explore my technical skills and tools expertise.")
+    st.markdown("<p style='text-align: center; color: var(--royal-light-text);'>Explore my technical skills and tools expertise.</p>", unsafe_allow_html=True)
     
     # Load custom styles
     load_styles()
